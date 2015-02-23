@@ -29,6 +29,7 @@ from       _common           import     systemMisc     as misc
 from       _common._colors   import     Colors
 from       _common           import     error
 from       _common           import     message        as Message
+import     dicom
 
 class med2image(object):
     """
