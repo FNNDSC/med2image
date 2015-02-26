@@ -47,7 +47,7 @@ class med2image(object):
     _dictErr = {
         'inputFileFail'   : {
             'action'        : 'trying to read input file, ',
-            'error'         : 'no handler for this cluster type has been derived.',
+            'error'         : 'could not access/read file -- does it exist? Do you have permission?',
             'exitCode'      : 10},
         'emailFail'   : {
             'action'        : 'attempting to send notification email, ',
@@ -81,6 +81,8 @@ class med2image(object):
         self._str_outputDir             = ''
 
         self._b_convertAllSlices        = False
+        self._str_sliceToConvert        = ''
+        self._str_frameToConvert        = ''
         self._sliceToConvert            = -1
         self._frameToConvert            = -1
 
@@ -92,9 +94,11 @@ class med2image(object):
         # are numpy ndarrays
         self._b_4D                      = False
         self._b_3D                      = False
+        self._b_DICOM                   = False
         self._Vnp_4DVol                 = None
         self._Vnp_3DVol                 = None
         self._Mnp_2Dslice               = None
+        self._dcm                       = None
 
         # A logger
         self._log                       = msg.Message()
@@ -110,19 +114,19 @@ class med2image(object):
             if key == "outputDir":          self._str_outputDir         = value
             if key == "outputFileStem":     self._str_outputFileStem    = value
             if key == "outputFileType":     self._str_outputFileType    = value
-            if key == "sliceToConvert":     self._sliceToConvert        = value
-            if key == "frameToConvert":     self._frameToConvert        = value
+            if key == "sliceToConvert":     self._str_sliceToConvert    = value
+            if key == "frameToConvert":     self._str_frameToConvert    = value
             if key == "showSlices":         self._b_showSlices          = value
 
-        if self._frameToConvert.lower() == 'm':
+        if self._str_frameToConvert.lower() == 'm':
             self._b_convertMiddleFrame = True
-        else:
-            self._frameToConvert = int(self._frameToConvert)
+        elif len(self._str_frameToConvert):
+            self._frameToConvert = int(self._str_frameToConvert)
 
-        if self._sliceToConvert.lower() == 'm':
+        if self._str_sliceToConvert.lower() == 'm':
             self._b_convertMiddleSlice = True
-        else:
-            self._sliceToConvert = int(self._sliceToConvert)
+        elif len(self._str_sliceToConvert):
+            self._sliceToConvert = int(self._str_sliceToConvert)
 
         str_fileName, str_fileExtension  = os.path.splitext(self._str_outputFileStem)
         if len(self._str_outputFileType):
@@ -173,6 +177,45 @@ class med2image(object):
             self._str_workingDir = args[0]
         else:
             return self._str_workingDir
+
+    def slice_save(self, astr_outputFile):
+        '''
+        Processes/saves a single slice.
+
+        ARGS
+
+        o astr_output
+        The output filename to save the slice to.
+
+        '''
+        self._log('outputfile = %s\n' % astr_outputFile)
+        pylab.imsave(astr_outputFile, self._Mnp_2Dslice, cmap = cm.Greys_r)
+
+
+class med2image_dcm(med2image):
+    '''
+    Sub class that handles DICOM data.
+    '''
+    def __init__(self, **kwargs):
+        med2image.__init__(self, **kwargs)
+        self._dcm = dicom.read_file(self._str_inputFile)
+        image = self._dcm.pixel_array
+        self._Mnp_2Dslice = image
+
+    def run(self):
+        '''
+        Runs the DICOM conversion based on internal state.
+        '''
+        self._log('Converting DICOM image.\n')
+        self._log('PatientName:    %s\n' % self._dcm.PatientName)
+        self._log('PatientAge:     %s\n' % self._dcm.PatientAge)
+        self._log('PatientSex:     %s\n' % self._dcm.PatientSex)
+        self._log('PatientID:      %s\n' % self._dcm.PatientID)
+        misc.mkdir(self._str_outputDir)
+        str_outputFile = '%s/%s.%s' % (self._str_outputDir,
+                                       self._str_outputFileStem,
+                                       self._str_outputFileType)
+        self.slice_save(str_outputFile)
 
 class med2image_nii(med2image):
     '''
@@ -250,11 +293,7 @@ class med2image_nii(med2image):
                                                             self._str_outputFileStem,
                                                             i,
                                                             self._str_outputFileType)
-                self._log('outputfile = %s\n' % str_outputFile)
-                pylab.imsave(str_outputFile,
-                             self._Mnp_2Dslice,
-                             cmap = cm.Greys_r)
-
+                self.slice_save(str_outputFile)
 
 def synopsis(ab_shortOnly = False):
     scriptName = os.path.basename(sys.argv[0])
@@ -300,11 +339,14 @@ def synopsis(ab_shortOnly = False):
         [--sliceToConvert <sliceToConvert>]
         In the case of volume files, the slice (z) index to convert. Ignored
         for 2D input data. If a '-1' is sent, then convert *all* the slices.
+        If an 'm' is specified, only convert the middle slice in an input
+        volume.
 
         [--frameToConvert <sliceToConvert>]
         In the case of 4D volume files, the volume (V) containing the
-        slice (z) index to convert. Ignored for 3D input data. If a '-1' is sent,
-        then convert *all* the frames.
+        slice (z) index to convert. Ignored for 3D input data. If a '-1' is
+        sent, then convert *all* the frames. If an 'm' is specified, only
+        convert the middle frame in the 4D input stack.
 
         [--showSlices]
         If specified, render/show image slices as they are created.
@@ -313,6 +355,11 @@ def synopsis(ab_shortOnly = False):
         Show either full help or short synopsis.
 
     EXAMPLES
+
+        o Convert each slice in a NIfTI volume to a jpg in a sub dir called
+          'out' and start the name each converted file with 'vol', do
+
+
 
 
     ''' % (scriptName)
@@ -377,9 +424,9 @@ if __name__ == '__main__':
         sys.exit(1)
 
     str_fileName, str_fileExtension  = os.path.splitext(args.inputFile)
-    b_processNifti       = False
     b_niftiExt           = (str_fileExtension   == '.nii'    or \
                             str_fileExtension   == '.gz')
+    b_dicomExt           =  str_fileExtension   == '.dcm'
     if b_niftiExt:
         C_convert     = med2image_nii(
                                 inputFile         = args.inputFile,
@@ -391,12 +438,12 @@ if __name__ == '__main__':
                                 showSlices        = args.showSlices
                             )
 
-    else:
-        C_convert   = med2image(
+    if b_dicomExt:
+        C_convert   = med2image_dcm(
                                 inputFile         = args.inputFile,
+                                outputDir         = args.outputDir,
                                 outputFileStem    = args.outputFileStem,
                                 outputFileType    = args.outputFileType,
-                                sliceToConvert    = args.sliceToConvert
                              )
 
 
@@ -404,7 +451,7 @@ if __name__ == '__main__':
     misc.tic()
     C_convert.run()
     if args.printElapsedTime: print("Elapsed time = %f seconds" % misc.toc())
-
+    sys.exit(0)
 
 
 
