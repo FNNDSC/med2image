@@ -10,6 +10,10 @@ Make sure that the following dependencies are installed on the host system:
 * pydicom (to read DICOM files)
 * matplotlib (to save data in various image formats)
 
+### FNNDSC script checkout
+
+An alternate method of installing this script and all its internal dependencies is to checkout the FNNDSC github scripts repository, https://github.com/FNNDSC/scripts.
+
 ## Command line arguments
 
         -i|--inputFile <inputFile>
