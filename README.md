@@ -12,7 +12,7 @@ Make sure that the following dependencies are installed on the host system:
 
 ### FNNDSC script checkout
 
-An alternate method of installing this script and all its internal dependencies is to checkout the FNNDSC github scripts repository, https://github.com/FNNDSC/scripts.
+An alternate method of installing this script and <b>some</b> of its internal dependencies (<tt>error.py, dgmsocket.py, message.py</tt>) is to checkout the FNNDSC github scripts repository, https://github.com/FNNDSC/scripts.
 
 ## Command line arguments
 
