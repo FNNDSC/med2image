@@ -356,10 +356,34 @@ def synopsis(ab_shortOnly = False):
 
     EXAMPLES
 
-        o Convert each slice in a NIfTI volume to a jpg in a sub dir called
-          'out' and start the name each converted file with 'vol', do
+    NIfTI
 
+    o Convert each slice in a NIfTI volume to a jpg in a sub dir called
+      'out' and start the name each converted file with 'vol', do
 
+    med2image.py -i input.nii -d out -o vol --outputFileType jpg --sliceToConvert -1
+
+    o Convert only the middle slice in an input volume
+
+    med2image.py -i input.nii -d out -o vol --outputFileType jpg --sliceToConvert m
+
+    o Convert a specific slice, i.e. slice 20
+
+    med2image.py -i input.nii -d out -o vol --outputFileType jpg --sliceToConvert 20
+
+    DICOM
+
+    o Convert a DICOM file called slice.dcm
+
+    med2image.py -i slice.dcm -d out -o slice --outputFileType jpg
+
+    o Convert all DICOM in a directory/series
+
+    for F in *dcm ; do ../med2image.py -i $F -d out -o $F --outputFileType jpg ; done
+
+    GITHUB
+
+        o See https://github.com/FNNDSC/med2image for more help and source.
 
 
     ''' % (scriptName)
