@@ -50,7 +50,7 @@ Both 3D and 4D NIfTI input data are understood. In the case of 4D NIfTI, a speci
 
 ### Examples
 ### All slices in a volume
-To convert <b>all</b> all slices in an input NIfTI volume called <tt>input.nii</tt>, to save the results in a directory called <tt>out</tt> and to use as output the file stem name <tt>vol</tt>, do
+To convert <b>all</b> slices in an input NIfTI volume called <tt>input.nii</tt>, to save the results in a directory called <tt>out</tt> and to use as output the file stem name <tt>vol</tt>, do
 
  ```med2image.py -i input.nii -d out -o vol --outputFileType jpg --sliceToConvert -1```
 
