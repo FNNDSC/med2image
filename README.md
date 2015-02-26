@@ -97,7 +97,7 @@ which will create a single file, <tt>slice.jpg</tt> in the directory <tt>out</tt
 ### Convert all DICOMS in a directory/series
 To convert all the DICOMS in a directory, simply run the script appropriately over each file in the directory. Assuming that you are in a directory with DICOM files all ending in <tt>dcm</tt>, simply run
 
-```for F in *dcm ; do ../med2image.py -i $F -d out -o $F --outputFileType jpg ; done```
+```for F in *dcm ; do med2image.py -i $F -d out -o $F --outputFileType jpg ; done```
 
 to create an output directory called <tt>out</tt> which will contain every DICOM file in the original directory, keeping the name of each file identical to the input DICOM, but with a <tt>jpg</tt> extension attached.
 
