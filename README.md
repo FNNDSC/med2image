@@ -23,17 +23,17 @@ Make sure that the following dependencies are installed on the host system:
         with an extension, this extension will be used to specify the
         output file type.
 
-        [--outputFileType <outputFileType>]
+        [-t|--outputFileType <outputFileType>]
         The output file type. If different to <outputFileStem> extension,
         will override extension in favour of <outputFileType>.
 
-        [--sliceToConvert <sliceToConvert>]
+        [-s|--sliceToConvert <sliceToConvert>]
         In the case of volume files, the slice (z) index to convert. Ignored
         for 2D input data. If a '-1' is sent, then convert *all* the slices.
         If an 'm' is specified, only convert the middle slice in an input
         volume.
         
-        [--frameToConvert <sliceToConvert>]
+        [-f|--frameToConvert <sliceToConvert>]
         In the case of 4D volume files, the volume (V) containing the
         slice (z) index to convert. Ignored for 3D input data. If a '-1' is 
         sent, then convert *all* the frames. If an 'm' is specified, only 
