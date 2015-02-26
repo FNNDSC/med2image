@@ -31,10 +31,10 @@ import     pylab
 import     matplotlib.cm     as         cm
 
 # Project specific imports
+import     error
+import     message           as msg
 from       _common           import     systemMisc     as misc
 from       _common._colors   import     Colors
-from       _common           import     error
-from       _common           import     message        as msg
 
 class med2image(object):
     """
@@ -379,7 +379,7 @@ def synopsis(ab_shortOnly = False):
 
     o Convert all DICOM in a directory/series
 
-    for F in *dcm ; do ../med2image.py -i $F -d out -o $F --outputFileType jpg ; done
+    for F in *dcm ; do med2image.py -i $F -d out -o $F --outputFileType jpg ; done
 
     GITHUB
 
