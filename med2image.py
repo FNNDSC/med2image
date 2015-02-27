@@ -404,11 +404,11 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--outputDir",
                         help="output image directory",
                         dest='outputDir',
-                        default='./')
+                        default='.')
     parser.add_argument("-t", "--outputFileType",
                         help="output image type",
                         dest='outputFileType',
-                        default='none')
+                        default='')
     parser.add_argument("-s", "--sliceToConvert",
                         help="slice to convert (for 3D data)",
                         dest='sliceToConvert',
@@ -447,10 +447,20 @@ if __name__ == '__main__':
         print(str_help)
         sys.exit(1)
 
-    str_fileName, str_fileExtension  = os.path.splitext(args.inputFile)
-    b_niftiExt           = (str_fileExtension   == '.nii'    or \
-                            str_fileExtension   == '.gz')
-    b_dicomExt           =  str_fileExtension   == '.dcm'
+    str_outputFileStem, str_outputFileExtension     = os.path.splitext(args.outputFileStem)
+    if len(str_outputFileExtension):
+        str_outputFileExtension = str_outputFileExtension.split('.')[1]
+    str_inputFileStem,  str_inputFileExtension      = os.path.splitext(args.inputFile)
+
+    if not len(args.outputFileType) and len(str_outputFileExtension):
+        args.outputFileType = str_outputFileExtension
+
+    if len(str_outputFileExtension):
+        args.outputFileStem = str_outputFileStem
+
+    b_niftiExt           = (str_inputFileExtension   == '.nii'    or \
+                            str_inputFileExtension   == '.gz')
+    b_dicomExt           =  str_inputFileExtension   == '.dcm'
     if b_niftiExt:
         C_convert     = med2image_nii(
                                 inputFile         = args.inputFile,
