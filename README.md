@@ -60,11 +60,9 @@ To convert <b>all</b> slices in an input NIfTI volume called <tt>vol.nii</tt>, t
 
 or equivalently and more verbosely,
 
-    ```
     med2image.py --inputFile vol.nii     --outputDir out      \
                  --outputFileStem image  --outputFileType jpg \
                  --sliceToConvert -1
-    ```
 
 This will create the following files in <tt>out</tt>
 
