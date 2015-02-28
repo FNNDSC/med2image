@@ -298,6 +298,10 @@ class med2image_nii(med2image):
 def synopsis(ab_shortOnly = False):
     scriptName = os.path.basename(sys.argv[0])
     shortSynopsis =  '''
+    NAME
+
+	    med2image.py - convert medical images to jpg/png/etc.
+
     SYNOPSIS
 
             %s                                   \\
@@ -308,16 +312,22 @@ def synopsis(ab_shortOnly = False):
                     [-s|--sliceToConvert <sliceToConvert>] \\
                     [-f|--frameToConvert <frameToConvert>] \\
                     [--showSlices]                         \\
-                    [--man|--synopsis]
+                    [-x|--man]				   \\
+		    [-y|--synopsis]
+
+    BRIEF EXAMPLE
+
+	    med2image.py -i slice.dcm -o slice.jpg
+
     ''' % scriptName
 
     description =  '''
     DESCRIPTION
 
         `%s' converts input medical image formatted data to a more
-        display friendly format.
+        display friendly format, such as jpg or png.
 
-        Currently understands nifti and dicom.
+        Currently understands NIfTI and DICOM input formats.
 
     ARGS
 
@@ -351,8 +361,11 @@ def synopsis(ab_shortOnly = False):
         [--showSlices]
         If specified, render/show image slices as they are created.
 
-        [--man|--synopsis]
-        Show either full help or short synopsis.
+        [-x|--man]
+        Show full help.
+
+	[-y|--synopsis]
+	Show brief help.
 
     EXAMPLES
 
@@ -428,12 +441,12 @@ if __name__ == '__main__':
                         dest='showSlices',
                         action='store_true',
                         default='False')
-    parser.add_argument("--man",
+    parser.add_argument("-x", "--man",
                         help="man",
                         dest='man',
                         action='store_true',
                         default=False)
-    parser.add_argument("--synopsis",
+    parser.add_argument("-y", "--synopsis",
                         help="short synopsis",
                         dest='synopsis',
                         action='store_true',
