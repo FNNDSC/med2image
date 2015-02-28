@@ -56,7 +56,15 @@ Both 3D and 4D NIfTI input data are understood. In the case of 4D NIfTI, a speci
 ### All slices in a volume
 To convert <b>all</b> slices in an input NIfTI volume called <tt>input.nii</tt>, to save the results in a directory called <tt>out</tt> and to use as output the file stem name <tt>vol</tt>, do
 
- ```med2image.py -i input.nii -d out -o vol --outputFileType jpg --sliceToConvert -1```
+ ```med2image.py -i input.nii -d out -o input.jpg -s -1```
+
+or equivalently and more verbosely,
+
+```
+ med2image.py --inputFile input.nii --outputDir out      \
+              --outputFileStem vol  --outputFileType jpg \
+              --sliceToConvert -1
+```
 
 This will create the following files in <tt>out</tt>
 
@@ -80,6 +88,10 @@ vol-slice053.jpg
 ### Convert only a single slice
 Mostly, you'll probably only want the "middle" slice in a volume will converted (for example to generate a representative thumbnail of the volume). To do this, simply specify a <tt>m</tt> to <tt>--sliceToConvert</tt>
 
+ ```med2image.py -i input.nii -o input.jpg -s m```
+
+or, again, slightly more verbosely and with an outputDirectory specifier
+
  ```med2image.py -i input.nii -d out -o vol --outputFileType jpg --sliceToConvert m```
 
 Alternatively a specific slice index can be converted. Use
@@ -94,14 +106,14 @@ DICOM conversion is currently file-by-file since DICOM data is typically single-
 ### Convert a single DICOM file
 To convert a single DICOM file called <tt>slice.dcm</tt>, do:
 
-```med2image.py -i slice.dcm -d out -o slice --outputFileType jpg```
+```med2image.py -i slice.dcm -o slice.jpg```
 
-which will create a single file, <tt>slice.jpg</tt> in the directory <tt>out</tt>.
+which will create a single file, <tt>slice.jpg</tt> in the current directory.
 
 ### Convert all DICOMS in a directory/series
 To convert all the DICOMS in a directory, simply run the script appropriately over each file in the directory. Assuming that you are in a directory with DICOM files all ending in <tt>dcm</tt>, simply run
 
-```for F in *dcm ; do med2image.py -i $F -d out -o $F --outputFileType jpg ; done```
+```for F in *dcm ; do med2image.py -i $F -d out -o $F.jpg ; done```
 
 to create an output directory called <tt>out</tt> which will contain every DICOM file in the original directory, keeping the name of each file identical to the input DICOM, but with a <tt>jpg</tt> extension attached.
 
