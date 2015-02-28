@@ -54,35 +54,35 @@ Both 3D and 4D NIfTI input data are understood. In the case of 4D NIfTI, a speci
 
 ### Examples
 ### All slices in a volume
-To convert <b>all</b> slices in an input NIfTI volume called <tt>input.nii</tt>, to save the results in a directory called <tt>out</tt> and to use as output the file stem name <tt>vol</tt>, do
+To convert <b>all</b> slices in an input NIfTI volume called <tt>vol.nii</tt>, to save the results in a directory called <tt>out</tt> and to use as output the file stem name <tt>image</tt>, do
 
- ```med2image.py -i input.nii -d out -o input.jpg -s -1```
+ ```med2image.py -i vol.nii -d out -o image.jpg -s -1```
 
 or equivalently and more verbosely,
 
-```
- med2image.py --inputFile input.nii --outputDir out      \
-              --outputFileStem vol  --outputFileType jpg \
-              --sliceToConvert -1
-```
+    ```
+    med2image.py --inputFile vol.nii     --outputDir out      \
+                 --outputFileStem image  --outputFileType jpg \
+                 --sliceToConvert -1
+    ```
 
 This will create the following files in <tt>out</tt>
 
 ```
-vol-slice000.jpg
-vol-slice001.jpg
-vol-slice002.jpg
-vol-slice003.jpg
-vol-slice004.jpg
-vol-slice005.jpg
-vol-slice006.jpg
-vol-slice007.jpg
+image-slice000.jpg
+image-slice001.jpg
+image-slice002.jpg
+image-slice003.jpg
+image-slice004.jpg
+image-slice005.jpg
+image-slice006.jpg
+image-slice007.jpg
 ...
-vol-slice049.jpg
-vol-slice050.jpg
-vol-slice051.jpg
-vol-slice052.jpg
-vol-slice053.jpg
+image-slice049.jpg
+image-slice050.jpg
+image-slice051.jpg
+image-slice052.jpg
+image-slice053.jpg
 ```
 
 ### Convert only a single slice
@@ -104,7 +104,7 @@ to convert only the 20th slice of the volume.
 DICOM conversion is currently file-by-file since DICOM data is typically single-file-per-slice. 
 
 ### Convert a single DICOM file
-To convert a single DICOM file called <tt>slice.dcm</tt>, do:
+To convert a single DICOM file called <tt>slice.dcm</tt> to <tt>slice.jpg</tt>, do:
 
 ```med2image.py -i slice.dcm -o slice.jpg```
 
