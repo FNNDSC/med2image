@@ -205,7 +205,9 @@ class med2image_dcm(med2image):
 
         if self._b_convertMiddleSlice:
             self._sliceToConvert = int(slices/2)
-            self._dcm = dicom.read_file(l_dcmFileNames[self._sliceToConvert])
+            self._dcm            = dicom.read_file(l_dcmFileNames[self._sliceToConvert])
+            str_outputFile       = l_dcmFileNames[self._sliceToConvert]
+            self._str_outputFileStem, ext = os.path.splitext(l_dcmFileNames[self._sliceToConvert])
         else:
             self._dcm = dicom.read_file(self._str_inputFile)
         image = self._dcm.pixel_array
@@ -222,6 +224,7 @@ class med2image_dcm(med2image):
         self._log('PatientID:                                  %s\n' % self._dcm.PatientID)
         if self._b_convertMiddleSlice:
             self._log('Converting middle slice in DICOM series:    %d\n' % self._sliceToConvert)
+
 
         misc.mkdir(self._str_outputDir)
         str_outputFile = '%s/%s.%s' % (self._str_outputDir,
@@ -426,6 +429,7 @@ if __name__ == '__main__':
                         dest='inputFile')
     parser.add_argument("-o", "--outputFileStem",
                         help="output file",
+                        default="output.jpg",
                         dest='outputFileStem')
     parser.add_argument("-d", "--outputDir",
                         help="output image directory",
