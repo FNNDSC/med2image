@@ -21,6 +21,7 @@ import     sys
 import     getpass
 import     argparse
 import     time
+import     glob
 import     numpy             as         np
 from       random            import     randint
 
@@ -198,7 +199,15 @@ class med2image_dcm(med2image):
     '''
     def __init__(self, **kwargs):
         med2image.__init__(self, **kwargs)
-        self._dcm = dicom.read_file(self._str_inputFile)
+
+        l_dcmFileNames = glob.glob('*.dcm')
+        slices         = len(l_dcmFileNames)
+
+        if self._b_convertMiddleSlice:
+            self._sliceToConvert = int(slices/2)
+            self._dcm = dicom.read_file(l_dcmFileNames[self._sliceToConvert])
+        else:
+            self._dcm = dicom.read_file(self._str_inputFile)
         image = self._dcm.pixel_array
         self._Mnp_2Dslice = image
 
@@ -207,10 +216,13 @@ class med2image_dcm(med2image):
         Runs the DICOM conversion based on internal state.
         '''
         self._log('Converting DICOM image.\n')
-        self._log('PatientName:    %s\n' % self._dcm.PatientName)
-        self._log('PatientAge:     %s\n' % self._dcm.PatientAge)
-        self._log('PatientSex:     %s\n' % self._dcm.PatientSex)
-        self._log('PatientID:      %s\n' % self._dcm.PatientID)
+        self._log('PatientName:                                %s\n' % self._dcm.PatientName)
+        self._log('PatientAge:                                 %s\n' % self._dcm.PatientAge)
+        self._log('PatientSex:                                 %s\n' % self._dcm.PatientSex)
+        self._log('PatientID:                                  %s\n' % self._dcm.PatientID)
+        if self._b_convertMiddleSlice:
+            self._log('Converting middle slice in DICOM series:    %d\n' % self._sliceToConvert)
+
         misc.mkdir(self._str_outputDir)
         str_outputFile = '%s/%s.%s' % (self._str_outputDir,
                                        self._str_outputFileStem,
@@ -371,7 +383,7 @@ def synopsis(ab_shortOnly = False):
 
     NIfTI
 
-    o Convert each slice in a NIfTI volume 'vol.nii' to a jpg called 
+    o Convert each slice in a NIfTI volume 'vol.nii' to a jpg called
       'image-sliceXXX.jpg' and store results in a directory called 'out':
 
     		med2image.py -i vol.nii -d out -o image.jpg -s -1
@@ -492,6 +504,7 @@ if __name__ == '__main__':
                                 outputDir         = args.outputDir,
                                 outputFileStem    = args.outputFileStem,
                                 outputFileType    = args.outputFileType,
+                                sliceToConvert    = args.sliceToConvert,
                              )
 
 
