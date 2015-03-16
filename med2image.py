@@ -250,6 +250,8 @@ class med2image_dcm(med2image):
         self._log('PatientAge:                                 %s\n' % self._dcm.PatientAge)
         self._log('PatientSex:                                 %s\n' % self._dcm.PatientSex)
         self._log('PatientID:                                  %s\n' % self._dcm.PatientID)
+        self._log('SeriesDescription:                          %s\n' % self._dcm.SeriesDescription)
+        self._log('ProtocolName:                               %s\n' % self._dcm.ProtocolName)
         if self._b_convertMiddleSlice:
             self._log('Converting middle slice in DICOM series:    %d\n' % self._sliceToConvert)
 
@@ -428,8 +430,8 @@ def synopsis(ab_shortOnly = False):
         [-x|--man]
         Show full help.
 
-	[-y|--synopsis]
-	Show brief help.
+        [-y|--synopsis]
+        Show brief help.
 
     EXAMPLES
 
