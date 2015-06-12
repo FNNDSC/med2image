@@ -84,7 +84,7 @@ image-slice053.jpg
 ```
 
 ### Convert only a single slice
-Mostly, you'll probably only want the "middle" slice in a volume will converted (for example to generate a representative thumbnail of the volume). To do this, simply specify a <tt>m</tt> to <tt>--sliceToConvert</tt>
+Mostly, you'll probably only want to convert the "middle" slice in a volume (for example to generate a representative thumbnail of the volume). To do this, simply specify a <tt>m</tt> to <tt>--sliceToConvert</tt>
 
  ```med2image.py -i input.nii -o input.jpg -s m```
 
