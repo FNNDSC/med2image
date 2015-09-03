@@ -390,9 +390,9 @@ def synopsis(ab_shortOnly = False):
         SPECIAL CASES:
         For DICOM data, the <outputFileStem> can be set to the value of
         an internal DICOM tag. The tag is specified by preceding the tag
-        name with a percent character '%', so 
+        name with a percent character '%%', so 
         
-            -o %ProtocolName
+            -o %%ProtocolName
             
         will use the DICOM 'ProtocolName' to name the output file. Note
         that special characters (like spaces) in the DICOM value are 
@@ -400,12 +400,12 @@ def synopsis(ab_shortOnly = False):
         
         Multiple tags can be specified, for example
         
-            -o %PatientName%PatientID%ProtocolName
+            -o %%PatientName%%PatientID%%ProtocolName
             
         and the output filename will have each DICOM tag string as 
         specified in order, connected with dashes.
         
-        A special %inputFile is available to specify the input file that
+        A special %%inputFile is available to specify the input file that
         was read (without extension).
 
         [-t|--outputFileType <outputFileType>]
