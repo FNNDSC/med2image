@@ -531,8 +531,12 @@ if __name__ == '__main__':
     str_outputFileStem, str_outputFileExtension     = os.path.splitext(args.outputFileStem)
     if len(str_outputFileExtension):
         str_outputFileExtension = str_outputFileExtension.split('.')[1]
-    str_inputFileStem,  str_inputFileExtension      = os.path.splitext(args.inputFile)
-
+    try:
+        str_inputFileStem,  str_inputFileExtension      = os.path.splitext(args.inputFile)
+    except:
+        print(synopsis(False))
+        sys.exit(1)
+    
     if not len(args.outputFileType) and len(str_outputFileExtension):
         args.outputFileType = str_outputFileExtension
 
