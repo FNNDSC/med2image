@@ -55,7 +55,33 @@ class med2image(object):
             'action'        : 'attempting to send notification email, ',
             'error'         : 'sending failed. Perhaps host is not email configured?',
             'exitCode'      : 20},
+        'dcmInsertionFail': {
+            'action'        : 'attempting insert DICOM into volume structure, ',
+            'error'         : 'a dimension mismatch occurred. This DICOM file is of different image size to the rest.',
+            'exitCode'      : 20
+            }
     }
+        
+    def log(self, *args):
+        '''
+        get/set the internal pipeline log message object.
+
+        Caller can further manipulate the log object with object-specific
+        calls.
+        '''
+        if len(args):
+            self._log = args[0]
+        else:
+            return self._log
+
+    def name(self, *args):
+        '''
+        get/set the descriptive name text of this object.
+        '''
+        if len(args):
+            self.__name = args[0]
+        else:
+            return self.__name
 
     def description(self, *args):
         '''
@@ -84,6 +110,9 @@ class med2image(object):
         # Object desc block
         #
         self._str_desc                  = ''
+        self._log                       = msg.Message()
+        self._log._b_syslog             = True
+        self.__name                     = "med2image"
 
         # Directory and filenames
         self._str_workingDir            = ''
@@ -121,6 +150,7 @@ class med2image(object):
         self._b_showSlices              = False
         self._b_convertMiddleSlice      = False
         self._b_convertMiddleFrame      = False
+        self._b_reslice                 = False
 
         for key, value in kwargs.iteritems():
             if key == "inputFile":          self._str_inputFile         = value
@@ -130,6 +160,7 @@ class med2image(object):
             if key == "sliceToConvert":     self._str_sliceToConvert    = value
             if key == "frameToConvert":     self._str_frameToConvert    = value
             if key == "showSlices":         self._b_showSlices          = value
+            if key == 'reslice':            self._b_reslice             = value
 
         if self._str_frameToConvert.lower() == 'm':
             self._b_convertMiddleFrame = True
@@ -193,6 +224,74 @@ class med2image(object):
         else:
             return self._str_workingDir
 
+    def dim_sliceSave(self, **kwargs):
+        index   = 0
+        frame   = 0
+        subDir  = ""
+        for key,val in kwargs.iteritems():
+            if key == 'index':  index       = val 
+            if key == 'frame':  frame       = val
+            if key == 'subDir': str_subDir  = val
+        
+        if self._b_4D:
+            str_outputFile = '%s/%s/%s-frame%03d-slice%03d.%s' % (
+                                                    self._str_outputDir,
+                                                    str_subDir,
+                                                    self._str_outputFileStem,
+                                                    frame, index,
+                                                    self._str_outputFileType)
+        else:
+            str_outputFile = '%s/%s/%s-slice%03d.%s' % (
+                                        self._str_outputDir,
+                                        str_subDir,
+                                        self._str_outputFileStem,
+                                        index,
+                                        self._str_outputFileType)
+        self.slice_save(str_outputFile)
+
+    def dim_save(self, **kwargs):
+        dims            = self._Vnp_3DVol.shape
+        self._log('Image volume logical (i, j, k) size: %s\n' % str(dims))
+        str_dim         = 'z'
+        b_makeSubDir    = False
+        b_rot90         = False
+        frame           = 0
+        indexStart      = -1
+        indexStop       = -1
+        for key, val in kwargs.iteritems():
+            if key == 'dimension':  str_dim         = val
+            if key == 'makeSubDir': b_makeSubDir    = val
+            if key == 'frame':      frame           = val
+            if key == 'indexStart': indexStart      = val 
+            if key == 'indexStop':  indexStop       = val
+            if key == 'rot90':      b_rot90         = val
+        
+        str_subDir  = ''
+        if b_makeSubDir: 
+            str_subDir = str_dim
+            misc.mkdir('%s/%s' % (self._str_outputDir, str_subDir))
+        if str_dim == 'x':
+            if indexStart == 0 and indexStop == -1:
+                indexStop  = dims[0]
+            for i in range(indexStart, indexStop):
+                self._Mnp_2Dslice = self._Vnp_3DVol[i,:,:]
+                if b_rot90: self._Mnp_2Dslice = np.rot90(self._Mnp_2Dslice)
+                self.dim_sliceSave(index = i, subDir = str_subDir)
+        if str_dim == 'y':
+            if indexStart == 0 and indexStop == -1:
+                indexStop  = dims[1]
+            for j in range(indexStart, indexStop):
+                self._Mnp_2Dslice = self._Vnp_3DVol[:,j,:]
+                if b_rot90: self._Mnp_2Dslice = np.rot90(self._Mnp_2Dslice)
+                self.dim_sliceSave(index = j, subDir = str_subDir)
+        if str_dim == 'z':
+            if indexStart == 0 and indexStop == -1:
+                indexStop  = dims[2]
+            for k in range(indexStart, indexStop):
+                self._Mnp_2Dslice = self._Vnp_3DVol[:,:,k]
+                if b_rot90: self._Mnp_2Dslice = np.rot90(self._Mnp_2Dslice)
+                self.dim_sliceSave(index = k, subDir = str_subDir)
+
     def slice_save(self, astr_outputFile):
         '''
         Processes/saves a single slice.
@@ -240,7 +339,10 @@ class med2image_dcm(med2image):
                 self._dcm = dicom.read_file(img)
                 image = self._dcm.pixel_array
                 #print('%s: %s\n' % (img, image.shape))
-                self._Vnp_3DVol[:,:,i] = image
+                try:
+                    self._Vnp_3DVol[:,:,i] = image
+                except Exception, e:
+                    error.fatal(self, 'dcmInsertionFail', '\nFor input DICOM file %s\n%s\n' % (img, str(e)))
                 i += 1
         if self._str_outputFileStem.startswith('%'):
             str_spec = self._str_outputFileStem
@@ -274,22 +376,22 @@ class med2image_dcm(med2image):
         if self._b_convertMiddleSlice:
             self._log('Converting middle slice in DICOM series:    %d\n' % self._sliceToConvert)
 
+        l_rot90 = [ True, True, False ]
         misc.mkdir(self._str_outputDir)
         if not self._b_3D:
             str_outputFile = '%s/%s.%s' % (self._str_outputDir,
                                         self._str_outputFileStem,
                                         self._str_outputFileType)
             self.slice_save(str_outputFile)
-        else:
-            dims = self._Vnp_3DVol.shape
-            for i in range(0, dims[2]):
-                self._Mnp_2Dslice       = self._Vnp_3DVol[:,:,i]
-                str_outputFile = '%s/%s-slice%03d.%s' % (self._str_outputDir,
-                                                        self._str_outputFileStem,
-                                                        i,
-                                                        self._str_outputFileType)
-                self.slice_save(str_outputFile)
-
+        if self._b_3D:
+            rotCount = 0
+            if self._b_reslice:
+                for dim in ['x', 'y', 'z']:
+                    self.dim_save(dimension = dim, makeSubDir = True, rot90 = l_rot90[rotCount])
+                    rotCount += 1
+            else:
+                self.dim_save(dimension = 'z', makeSubDir = False, rot90 = False)
+                
 class med2image_nii(med2image):
     '''
     Sub class that handles NIfTI data.
@@ -344,29 +446,17 @@ class med2image_nii(med2image):
                 self._sliceToConvert = int(slices/2)
 
             if self._sliceToConvert == -1:
-                sliceEnd    = self._Vnp_3DVol.shape[2]
+                sliceEnd    = -1
             else:
                 sliceStart  = self._sliceToConvert
                 sliceEnd    = self._sliceToConvert + 1
 
             misc.mkdir(self._str_outputDir)
-            for i in range(sliceStart, sliceEnd):
-                imslice                 = self._Vnp_3DVol[:,:,i]
-                # rotate the slice by 90 for conventional display
-                self._Mnp_2Dslice       = np.rot90(imslice)
-
-                if self._b_4D:
-                    str_outputFile = '%s/%s-frame%03d-slice%03d.%s' % (
-                                                            self._str_outputDir,
-                                                            self._str_outputFileStem,
-                                                            f, i,
-                                                            self._str_outputFileType)
-                else:
-                    str_outputFile = '%s/%s-slice%03d.%s' % (self._str_outputDir,
-                                                            self._str_outputFileStem,
-                                                            i,
-                                                            self._str_outputFileType)
-                self.slice_save(str_outputFile)
+            if self._b_reslice:
+                for dim in ['x', 'y', 'z']:
+                    self.dim_save(dimension = dim, makeSubDir = True, indexStart = sliceStart, indexStop = sliceEnd, rot90 = True)
+            else:
+                self.dim_save(dimension = 'z', makeSubDir = False, indexStart = sliceStart, indexStop = sliceEnd, rot90 = True)
 
 def synopsis(ab_shortOnly = False):
     scriptName = os.path.basename(sys.argv[0])
@@ -454,6 +544,12 @@ def synopsis(ab_shortOnly = False):
 
         [--showSlices]
         If specified, render/show image slices as they are created.
+        
+        [--reslice]
+        For 3D data only. Assuming [i,j,k] coordinates, the default is to save
+        along the 'k' direction. By passing a --reslice image data in the 'i' and
+        'j' directions are also saved. Furthermore, the <outputDir> is subdivided into
+        'slice' (k), 'row' (i), and 'col' (j) subdirectories.
 
         [-x|--man]
         Show full help.
@@ -485,9 +581,11 @@ def synopsis(ab_shortOnly = False):
 
     		med2image.py -i slice.dcm -o slice.jpg
 
-    o Convert all DICOM in a directory/series
+    o Convert all DICOMs in a directory. Note that is assumes all DICOM files
+      in the directory containing the passed file belong to the same series.
+      Conversion will fail if multiple series are interspersed in the same dir.
 
-    		for F in *dcm ; do med2image.py -i $F -o ${F}.jpg ; done
+                med2image.py -i slice.dcm -o slice.jpg -s -1
 
     GITHUB
 
@@ -529,6 +627,11 @@ if __name__ == '__main__':
     parser.add_argument("--printElapsedTime",
                         help="print program run time",
                         dest='printElapsedTime',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('-r', '--reslice',
+                        help="save images along i,j,k directions -- 3D input only",
+                        dest='reslice',
                         action='store_true',
                         default=False)
     parser.add_argument('--showSlices',
@@ -582,7 +685,8 @@ if __name__ == '__main__':
                                 outputFileType    = args.outputFileType,
                                 sliceToConvert    = args.sliceToConvert,
                                 frameToConvert    = args.frameToConvert,
-                                showSlices        = args.showSlices
+                                showSlices        = args.showSlices,
+                                reslice           = args.reslice
                             )
 
     if b_dicomExt:
@@ -592,6 +696,7 @@ if __name__ == '__main__':
                                 outputFileStem    = args.outputFileStem,
                                 outputFileType    = args.outputFileType,
                                 sliceToConvert    = args.sliceToConvert,
+                                reslice           = args.reslice
                              )
 
 
