@@ -387,10 +387,10 @@ class med2image_dcm(med2image):
             rotCount = 0
             if self._b_reslice:
                 for dim in ['x', 'y', 'z']:
-                    self.dim_save(dimension = dim, makeSubDir = True, rot90 = l_rot90[rotCount])
+                    self.dim_save(dimension = dim, makeSubDir = True, rot90 = l_rot90[rotCount], indexStart = 0, indexStop = -1)
                     rotCount += 1
             else:
-                self.dim_save(dimension = 'z', makeSubDir = False, rot90 = False)
+                self.dim_save(dimension = 'z', makeSubDir = False, rot90 = False, indexStart = 0, indexStop = -1)
                 
 class med2image_nii(med2image):
     '''
