@@ -91,6 +91,7 @@ class med2image(object):
         self._str_outputFileStem        = ''
         self._str_outputFileType        = ''
         self._str_outputDir             = ''
+        self._str_inputDir              = ''
 
         self._b_convertAllSlices        = False
         self._str_sliceToConvert        = ''
@@ -140,6 +141,8 @@ class med2image(object):
         elif len(self._str_sliceToConvert):
             self._sliceToConvert = int(self._str_sliceToConvert)
 
+        self._str_inputDir               = os.path.dirname(self._str_inputFile)
+        if not len(self._str_inputDir): self._str_inputDir = '.'
         str_fileName, str_fileExtension  = os.path.splitext(self._str_outputFileStem)
         if len(self._str_outputFileType):
             str_fileExtension            = '.%s' % self._str_outputFileType
@@ -211,7 +214,7 @@ class med2image_dcm(med2image):
     def __init__(self, **kwargs):
         med2image.__init__(self, **kwargs)
 
-        self.l_dcmFileNames = sorted(glob.glob('*.dcm'))
+        self.l_dcmFileNames = sorted(glob.glob('%s/*.dcm' % self._str_inputDir))
         self.slices         = len(self.l_dcmFileNames)
 
         if self._b_convertMiddleSlice:
@@ -230,13 +233,13 @@ class med2image_dcm(med2image):
             self._dcm = dicom.read_file(self._str_inputFile)
             image = self._dcm.pixel_array
             shape2D = image.shape
-            print(shape2D)
+            #print(shape2D)
             self._Vnp_3DVol = np.empty( (shape2D[0], shape2D[1], self.slices) )
             i = 0
             for img in self.l_dcmFileNames:
                 self._dcm = dicom.read_file(img)
                 image = self._dcm.pixel_array
-                print('%s: %s\n' % (img, image.shape))
+                #print('%s: %s\n' % (img, image.shape))
                 self._Vnp_3DVol[:,:,i] = image
                 i += 1
         if self._str_outputFileStem.startswith('%'):
