@@ -1,4 +1,11 @@
 # med2image
+
+## Quick Overview
+
+* Convert DICOM or NIfTI to jpg or png
+
+## Overview
+
 <tt>med2image</tt> is a simple Python utility that converts medical image formatted files to more visual friendly ones, such as <tt>png</tt> and <tt>jpg</tt>.
 
 Currently, NIfTI and DICOM input formats are understood, while any graphical output type that is supported by <tt>matplotlib</tt> can be generated.
@@ -27,6 +34,27 @@ An alternate method of installing this script and <b>some</b> of its internal de
         with an extension, this extension will be used to specify the
         output file type.
 
+        SPECIAL CASES:
+        For DICOM data, the <outputFileStem> can be set to the value of
+        an internal DICOM tag. The tag is specified by preceding the tag
+        name with a percent character '%', so
+
+            -o %ProtocolName
+
+        will use the DICOM 'ProtocolName' to name the output file. Note
+        that special characters (like spaces) in the DICOM value are
+        replaced by underscores '_'.
+
+        Multiple tags can be specified, for example
+
+            -o %PatientName%PatientID%ProtocolName
+
+        and the output filename will have each DICOM tag string as
+        specified in order, connected with dashes.
+
+        A special %inputFile is available to specify the input file that
+        was read (without extension).
+
         [-t|--outputFileType <outputFileType>]
         The output file type. If different to <outputFileStem> extension,
         will override extension in favour of <outputFileType>.
@@ -46,8 +74,17 @@ An alternate method of installing this script and <b>some</b> of its internal de
         [--showSlices]
         If specified, render/show image slices as they are created.
 
-        [--man|--synopsis]
-        Show either full help or short synopsis.
+        [--reslice]
+        For 3D data only. Assuming [i,j,k] coordinates, the default is to save
+        along the 'k' direction. By passing a --reslice image data in the 'i' and
+        'j' directions are also saved. Furthermore, the <outputDir> is subdivided into
+        'slice' (k), 'row' (i), and 'col' (j) subdirectories.
+
+        [-x|--man]
+        Show full help.
+
+        [-y|--synopsis]
+        Show brief help.
 
 ## NIfTI conversion 
 Both 3D and 4D NIfTI input data are understood. In the case of 4D NIfTI, a specific <b>frame</b> can be specified in conjunction with a specific <b>slice</b> index. In most cases, only a <b>slice</b> is required since most NIfTI data is 3D. Furthermore, all slices can be converted, or just the middle one.
@@ -99,7 +136,6 @@ Alternatively a specific slice index can be converted. Use
 to convert only the 20th slice of the volume.
 
 ## DICOM conversion
-DICOM conversion is currently file-by-file since DICOM data is typically single-file-per-slice. 
 
 ### Convert a single DICOM file
 To convert a single DICOM file called <tt>slice.dcm</tt> to <tt>slice.jpg</tt>, do:
@@ -109,9 +145,17 @@ To convert a single DICOM file called <tt>slice.dcm</tt> to <tt>slice.jpg</tt>, 
 which will create a single file, <tt>slice.jpg</tt> in the current directory.
 
 ### Convert all DICOMS in a directory/series
-To convert all the DICOMS in a directory, simply run the script appropriately over each file in the directory. Assuming that you are in a directory with DICOM files all ending in <tt>dcm</tt>, simply run
+To convert all the DICOMS in a directory, simply specifiy a '-1' to the sliceIndex:
 
-```for F in *dcm ; do med2image.py -i $F -d out -o $F.jpg ; done```
+```med2image.py -i inputDir/slice.dcm -d outputDir -o slice.jpg -s -1```
 
-to create an output directory called <tt>out</tt> which will contain every DICOM file in the original directory, keeping the name of each file identical to the input DICOM, but with a <tt>jpg</tt> extension attached.
+Note that this assumes all the DICOM files in the directory <tt>inputDir</tt> belong to the same series.
+
+## Multiple Direction Reslicing
+By default, only the slice (or slices) in the acquisition direction are converted. However, by passing a <tt>-r</tt> to the script, all dimensions are converted. Since the script does not know the anatomical orientation of the image, the directions are simply labeled <tt>x</tt>, <tt>y</tt>, and <tt>z</tt>.
+
+The <tt>z</tt> direction is the original acquistion (slice) direction, while <tt>x</tt> and <tt>y</tt> correspond to planes normal to the row and column directions.
+
+Converted images are stored in subdirectories labeled <tt>x</tt>, <tt>y</tt>, and <tt>z</tt>.
+
 
