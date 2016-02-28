@@ -318,25 +318,25 @@ class med2image_dcm(med2image):
 
         if self._b_convertMiddleSlice:
             self._sliceToConvert = int(self.slices/2)
-            self._dcm            = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert])
+            self._dcm            = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert],force=True)
             self._str_inputFile  = self.l_dcmFileNames[self._sliceToConvert]
             str_outputFile       = self.l_dcmFileNames[self._sliceToConvert]
             if not self._str_outputFileStem.startswith('%'):
                 self._str_outputFileStem, ext = os.path.splitext(self.l_dcmFileNames[self._sliceToConvert])
         if not self._b_convertMiddleSlice and self._sliceToConvert != -1:
-            self._dcm = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert])
+            self._dcm = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert],force=True)
         else:
-            self._dcm = dicom.read_file(self._str_inputFile)
+            self._dcm = dicom.read_file(self._str_inputFile,force=True)
         if self._sliceToConvert == -1:
             self._b_3D = True
-            self._dcm = dicom.read_file(self._str_inputFile)
+            self._dcm = dicom.read_file(self._str_inputFile,force=True)
             image = self._dcm.pixel_array
             shape2D = image.shape
             #print(shape2D)
             self._Vnp_3DVol = np.empty( (shape2D[0], shape2D[1], self.slices) )
             i = 0
             for img in self.l_dcmFileNames:
-                self._dcm = dicom.read_file(img)
+                self._dcm = dicom.read_file(img,force=True)
                 image = self._dcm.pixel_array
                 #print('%s: %s\n' % (img, image.shape))
                 try:
