@@ -22,7 +22,7 @@ sys.path.insert(1, os.path.join(os.path.dirname(__file__), '..'))
 import argparse
 import med2image
 
-
+#import pdb; pdb.set_trace()
 parser = argparse.ArgumentParser(
     description="med2view converts an input medical image file to a more conventional graphical format.")
 parser.add_argument("-i", "--inputFile",

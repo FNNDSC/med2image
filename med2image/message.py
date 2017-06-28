@@ -7,8 +7,8 @@ import  inspect
 from    io          import  IOBase
 
 # pman local dependencies
-from    dgmsocket   import  C_dgmsocket
-from    _colors     import  Colors
+from    .dgmsocket   import  C_dgmsocket
+from    ._colors     import  Colors
 
 class Message:
     '''
