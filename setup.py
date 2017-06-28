@@ -7,14 +7,14 @@ if 10 * sys.version_info[0]  + sys.version_info[1] < 35:
 from setuptools import setup
 
 def readme():
-    with open('README.md') as f:
+    with open('README.rst') as f:
         return f.read()
 
 setup(
       name             =   'med2image',
       version          =   '0.2',
       description      =   '(Python) utility to convert medical images to jpg and png',
-      long_description =   readme(),
+      long_description =   '(Python) utility to convert medical images to jpg and png',
       author           =   'FNNDSC',
       author_email     =   'dev@babymri.org',
       url              =   'https://github.com/FNNDSC/med2image',
