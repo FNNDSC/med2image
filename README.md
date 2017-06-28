@@ -16,6 +16,7 @@ Make sure that the following dependencies are installed on the host system:
 * nibabel (to read NIfTI files)
 * pydicom (to read DICOM files)
 * matplotlib (to save data in various image formats)
+* pillow (to save data in jpg format)
 
 ### FNNDSC script checkout
 
