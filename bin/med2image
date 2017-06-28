@@ -1,0 +1,131 @@
+#!/usr/bin/env python3
+#
+# NAME
+#
+#        med2image
+#
+# DESCRIPTION
+#
+#        'med2image' converts from medical image data files to
+#        display-friendly formats (like png and jpg).
+#
+# HISTORY
+#
+# 23 February 2015
+# o Initial design and coding.
+#
+
+# System imports
+import os
+import sys
+sys.path.insert(1, os.path.join(os.path.dirname(__file__), '..'))
+import argparse
+import med2image
+
+
+parser = argparse.ArgumentParser(
+    description="med2view converts an input medical image file to a more conventional graphical format.")
+parser.add_argument("-i", "--inputFile",
+                    help="input file",
+                    dest='inputFile')
+parser.add_argument("-o", "--outputFileStem",
+                    help="output file",
+                    default="output.jpg",
+                    dest='outputFileStem')
+parser.add_argument("-d", "--outputDir",
+                    help="output image directory",
+                    dest='outputDir',
+                    default='.')
+parser.add_argument("-t", "--outputFileType",
+                    help="output image type",
+                    dest='outputFileType',
+                    default='')
+parser.add_argument("-s", "--sliceToConvert",
+                    help="slice to convert (for 3D data)",
+                    dest='sliceToConvert',
+                    default='-1')
+parser.add_argument("-f", "--frameToConvert",
+                    help="frame to convert (for 4D data)",
+                    dest='frameToConvert',
+                    default='-1')
+parser.add_argument("--printElapsedTime",
+                    help="print program run time",
+                    dest='printElapsedTime',
+                    action='store_true',
+                    default=False)
+parser.add_argument('-r', '--reslice',
+                    help="save images along i,j,k directions -- 3D input only",
+                    dest='reslice',
+                    action='store_true',
+                    default=False)
+parser.add_argument('--showSlices',
+                    help="show slices that are converted",
+                    dest='showSlices',
+                    action='store_true',
+                    default='False')
+parser.add_argument("-x", "--man",
+                    help="man",
+                    dest='man',
+                    action='store_true',
+                    default=False)
+parser.add_argument("-y", "--synopsis",
+                    help="short synopsis",
+                    dest='synopsis',
+                    action='store_true',
+                    default=False)
+args = parser.parse_args()
+
+if args.man or args.synopsis:
+    if args.man:
+        str_help = synopsis(False)
+    else:
+        str_help = synopsis(True)
+    print(str_help)
+    sys.exit(1)
+
+str_outputFileStem, str_outputFileExtension = os.path.splitext(args.outputFileStem)
+if len(str_outputFileExtension):
+    str_outputFileExtension = str_outputFileExtension.split('.')[1]
+try:
+    str_inputFileStem, str_inputFileExtension = os.path.splitext(args.inputFile)
+except:
+    print(synopsis(False))
+    sys.exit(1)
+
+if not len(args.outputFileType) and len(str_outputFileExtension):
+    args.outputFileType = str_outputFileExtension
+
+if len(str_outputFileExtension):
+    args.outputFileStem = str_outputFileStem
+
+b_niftiExt = (str_inputFileExtension == '.nii' or
+              str_inputFileExtension == '.gz')
+b_dicomExt = str_inputFileExtension == '.dcm'
+if b_niftiExt:
+    C_convert = med2image.med2image_nii(
+        inputFile=args.inputFile,
+        outputDir=args.outputDir,
+        outputFileStem=args.outputFileStem,
+        outputFileType=args.outputFileType,
+        sliceToConvert=args.sliceToConvert,
+        frameToConvert=args.frameToConvert,
+        showSlices=args.showSlices,
+        reslice=args.reslice
+    )
+
+if b_dicomExt:
+    C_convert = med2image.med2image_dcm(
+        inputFile=args.inputFile,
+        outputDir=args.outputDir,
+        outputFileStem=args.outputFileStem,
+        outputFileType=args.outputFileType,
+        sliceToConvert=args.sliceToConvert,
+        reslice=args.reslice
+    )
+
+# And now run it!
+med2image.misc.tic()
+C_convert.run()
+if args.printElapsedTime: print("Elapsed time = %f seconds" % med2image.misc.toc())
+sys.exit(0)
+

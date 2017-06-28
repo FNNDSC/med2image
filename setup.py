@@ -12,7 +12,7 @@ def readme():
 
 setup(
       name             =   'med2image',
-      version          =   '0.4',
+      version          =   '0.5',
       description      =   '(Python) utility to convert medical images to jpg and png',
       long_description =   '(Python) utility to convert medical images to jpg and png',
       author           =   'FNNDSC',
@@ -22,7 +22,7 @@ setup(
       install_requires =   ['nibabel', 'pydicom', 'numpy', 'matplotlib', 'pillow'],
       #test_suite       =   'nose.collector',
       #tests_require    =   ['nose'],
-      scripts          =   ['med2image.py'],
+      scripts          =   ['bin/med2image'],
       license          =   'MIT',
       zip_safe         =   False
 )
