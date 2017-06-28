@@ -1,12 +1,14 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.5
 
 import  sys
 import  os
 import  time
 import  inspect
-import  types
-import  dgmsocket as dgm
-from    _common._colors import Colors
+from    io          import  IOBase
+
+# pman local dependencies
+from    dgmsocket   import  C_dgmsocket
+from    _colors     import  Colors
 
 class Message:
     '''
@@ -88,16 +90,16 @@ class Message:
 
 
     def syslog(self, *args):
-	'''
-	get/set the syslog flag.
+        '''
+        get/set the syslog flag.
 
-	The syslog flag toggles prepending each message with
-        a syslog-style prefix.
+        The syslog flag toggles prepending each message with
+            a syslog-style prefix.
 
-	syslog():               returns the current syslog flag
-	syslog(True|False):     sets the flag to True|False
+        syslog():               returns the current syslog flag
+        syslog(True|False):     sets the flag to True|False
 
-	'''
+        '''
         if len(args):
             self._b_syslog = args[0]
         else:
@@ -173,12 +175,13 @@ class Message:
             if self._logHandle and self._logHandle != sys.stdout:
                 self._logHandle.close()
             
-            if type(self._logFile) is types.FileType:
+            # if type(self._logFile) is types.FileType:
+            if isinstance(self._logFile, IOBase):
                 self._logHandle = self._logFile
             elif self._logFile == 'stdout':
                 self._logHandle = sys.stdout
             elif self.socket_parse(self._logFile):
-                self._logHandle = dgm.C_dgmsocket(
+                self._logHandle = C_dgmsocket(
                                             self._socketRemote,
                                             int(self._socketPort))
             else:
@@ -276,12 +279,14 @@ class Message:
         verbosity       = 0
         lw              = 0
         rw              = 0
-        
-        for key, value in kwargs.iteritems():
+        str_end         = ' '
+
+        for key, value in kwargs.items():
             if key == 'debug' or key == 'verbose':      verbosity       = value
             if key == 'lw':                             lw              = -value
             if key == 'rw':                             rw              = value
             if key == 'syslog':                         self._b_syslog  = value
+            if key == 'end':                            str_end         = value
 
         if self._b_tag and len(self._str_tag):
             str_prepend = Colors.LIGHT_CYAN + self._str_tag + ' ' + Colors.NO_COLOUR
@@ -292,11 +297,13 @@ class Message:
             str_prepend = Colors.LIGHT_GRAY + self._str_syslog + Colors.NO_COLOUR
         if len(args):
             str_msg = '%s%s' % (str_prepend, args[0])
-	else:
+        else:
             str_msg = '%s%s' % (str_prepend, self._str_payload)
             self._str_payload = ''
         if lw: str_msg  = '%*s' % (lw, str_msg)
         if rw: str_msg  = '%*s' % (rw, str_msg)
+        if self._b_flushNewLine and str_end != '':    str_msg += '\n'
+
         if self._logHandle == sys.stdout:
             if verbosity:
                 if self.canPrintVerbose(verbosity):
@@ -348,13 +355,14 @@ class Message:
         # (current) system stdout and stderr file handles
         self._sys_stdout        = sys.stdout
         self._sys_stderr        = sys.stderr
-        
+
         self._verbosity         = 1
         self._b_syslog          = False
         self._str_syslog        = ''
         self._b_tag             = False
         self._str_tag           = ''
         self._b_tee             = False
+        self._b_flushNewLine    = False
 
         self._b_isSocket        = False
         self._socketPort        = 0
@@ -369,7 +377,7 @@ class Message:
         self._pid               = os.getpid()
 
         self.to(self._logFile)
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             if key == "syslogPrepend":  self._b_syslog          = int(value)
             if key == "logTo":          self.to(value)
             if key == 'tee':            self._b_tee             = value
@@ -388,8 +396,8 @@ if __name__ == "__main__":
     log1(Colors.RED + Colors.WHITE_BCKGRND + 'hello world!\n' + Colors.NO_COLOUR)
 
     # Send message via datagram to 'pretoria' on port '1701'.
-    log1.to('pretoria:1701')
-    log1('hello, pretoria!\n');
+    log1.to('pangea:1701')
+    log1('hello, pangea!\n');
     log1('this has been sent over a datagram socket...\n')
 
     # Now for some column width specs and 'debug' type messages
@@ -398,11 +406,11 @@ if __name__ == "__main__":
     # level less-than-or-equal-to 10 will be passed.
     log1.to('stdout')
     log1.verbosity(10)
-    log1('starting process 1...', lw=85, debug=5)
+    log1('starting process 1...', lw=90, debug=5)
     log1('[ ok ]\n', rw=20, syslog=False, debug=5)
-    log1('parsing process 1 outputs...', lw=85, debug=5)
+    log1('parsing process 1 outputs...', lw=90, debug=5)
     log1('[ ok ]\n', rw=20, syslog=False, debug=5)
-    log1('preparing final report...', lw=85, debug=5)
+    log1('preparing final report...', lw=90, debug=5)
     log1('[ ok ]\n', rw=20, syslog=False, debug=5)
 
     log2.to('/tmp/log2.log')
@@ -418,11 +426,11 @@ if __name__ == "__main__":
     # then all messages will be displayed regardless
     # of the internal verbosity level.
     log2.verbosity(1)   
-    log2('starting process 1...', lw=85, debug=5)
+    log2('starting process 1...', lw=90, debug=5)
     log2('[ ok ]\n', rw=20, syslog=False, debug=5)
-    log2('parsing process 1 outputs...', lw=85, debug=5)
+    log2('parsing process 1 outputs...', lw=90, debug=5)
     log2('[ ok ]\n', rw=20, syslog=False, debug=5)
-    log2('preparing final report...', lw=85, debug=5)
+    log2('preparing final report...', lw=90, debug=5)
     log2('[ ok ]\n', rw=20, syslog=False, debug=5)
 
     

@@ -26,7 +26,7 @@ key has a dictionary of 'action', 'error', 'exitCode':
 import  inspect
 import  sys
 
-from    _common._colors import Colors
+from _colors import Colors
 
 def report(     callingClass,
                 astr_key,

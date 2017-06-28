@@ -22,19 +22,18 @@
 #
 
 # System imports
-import          os, fnmatch
+import          os
+import          fnmatch
 import          sys
-import          time
 import          string
 import          re
 import          types
-import          commands
 from            subprocess      import *
-from            cStringIO       import StringIO
+from            io       import StringIO
 from            numpy           import *
 import          time
 import          itertools
-import          popen2, fcntl, select
+# import          popen2, fcntl, select
 
 # For internal timing:
 Gtic_start = 0.0
@@ -244,13 +243,13 @@ def error_exit(astr_func,
                         astr_action,
                         astr_error,
                         aexitCode):
-        print "FATAL ERROR"
-        print "\tSorry, some error seems to have occurred in <%s::%s>" \
-                % ('systemMisc', astr_func)
-        print "\tWhile %s" % astr_action
-        print "\t%s" % astr_error
-        print ""
-        print "Returning to system with error code %d" % aexitCode
+        print("FATAL ERROR")
+        print("\tSorry, some error seems to have occurred in <%s::%s>" %
+              ('systemMisc', astr_func))
+        print("\tWhile %s" % astr_action)
+        print("\t%s" % astr_error)
+        print("")
+        print("Returning to system with error code %d" % aexitCode)
         sys.exit(aexitCode)
 
 def printf(format, *args):
@@ -342,7 +341,7 @@ def toc(*args, **kwargs):
     """
     global Gtic_start
     f_elapsedTime = time.time() - Gtic_start
-    for key, value in kwargs.iteritems():
+    for key, value in kwargs.items():
         if key == 'sysprint':   return value % f_elapsedTime
         if key == 'default':    return "Elapsed time = %f seconds." % f_elapsedTime
     return f_elapsedTime
@@ -809,7 +808,7 @@ def base10toN(num, n):
         new_num_string = remainder_string + new_num_string
         new_num_arr = r_[remainder, new_num_arr]
         current = current / n
-    print new_num_arr
+    print(new_num_arr)
     return new_num_string
 
 def list_i2str(ilist):
@@ -892,36 +891,36 @@ def str_blockIndent(astr_buf, a_tabs=1, a_tabLength=4, **kwargs):
 
 def valuePair_fprint(astr_name, afvalue=None, leftCol=40, rightCol=40):
         if afvalue != None:
-            print '%*s:%*f' % (leftCol, astr_name, rightCol, afvalue)
+            print('%*s:%*f' % (leftCol, astr_name, rightCol, afvalue))
         else:
             printf('%*f', leftCol, astr_name)
 def valuePair_sprint(astr_name, astr_value, leftCol=40, rightCol=40):
         if len(astr_value):
-            print '%*s:%*s' % (leftCol, astr_name, rightCol, astr_value)
+            print('%*s:%*s' % (leftCol, astr_name, rightCol, astr_value))
         else:
             printf('%*s', leftCol, astr_name)
 def valuePair_dprint(astr_name, avalue=None, leftCol=40, rightCol=40):
         if avalue != None:
-            print '%*s:%*d' % (leftCol, astr_name, rightCol, avalue)
+            print('%*s:%*d' % (leftCol, astr_name, rightCol, avalue))
         else:
             printf('%*d', leftCol, astr_name)
 
 def html(astr_string, astr_tag="p"):
-        print """
+        print("""
         <%s>
         %s
         </%s>
-        """ % (astr_tag, astr_string, astr_tag)
+        """ % (astr_tag, astr_string, astr_tag))
 
 def PRE(astr_string):
-        print """
+        print("""
         <pre>
         %s
         </pre>
-        """ % astr_string
+        """ % astr_string)
 
 def P(astr_string):
-        print "<p>%s</p>" % astr_string
+        print("<p>%s</p>" % astr_string)
 
 def system_eval(str_command, b_echoCommand=0):
         if b_echoCommand: printf('<p>str_command = %s</p>', str_command)
@@ -977,7 +976,7 @@ def subprocess_eval(str_command, b_echoCommand=0):
     try:
         str_forRet = str_command + " 2>/dev/null >/dev/null"
         retcode = call(str_forRet, shell=True)
-    except OSError, e:
+    except OSError as e:
         b_OK = False
     return str_stdout, str_stderr, retcode
 
@@ -1044,11 +1043,11 @@ def shellne(command):
     data = child.read()
     err = child.close()
     if err:
-        raise RuntimeError, '%s failed w/ exit code %d' % (command, err)
+        raise RuntimeError('%s failed w/ exit code %d' % (command, err))
     return data
 ## end of http://code.activestate.com/recipes/52296/ }}}
 
-def mkdir(newdir, mode=0775):
+def mkdir(newdir, mode=0o775):
     """
     works the way a good mkdir should :)
         - already exists, silently complete

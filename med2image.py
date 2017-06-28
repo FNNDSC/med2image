@@ -18,12 +18,9 @@
 # System imports
 import     os
 import     sys
-import     getpass
 import     argparse
-import     time
 import     glob
 import     numpy             as         np
-from       random            import     randint
 import     re
 
 # System dependency imports
@@ -35,8 +32,8 @@ import     matplotlib.cm     as         cm
 # Project specific imports
 import     error
 import     message           as msg
-from       _common           import     systemMisc     as misc
-from       _common._colors   import     Colors
+import     systemMisc        as misc
+
 
 class med2image(object):
     """
@@ -152,7 +149,7 @@ class med2image(object):
         self._b_convertMiddleFrame      = False
         self._b_reslice                 = False
 
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             if key == "inputFile":          self._str_inputFile         = value
             if key == "outputDir":          self._str_outputDir         = value
             if key == "outputFileStem":     self._str_outputFileStem    = value
@@ -228,7 +225,7 @@ class med2image(object):
         index   = 0
         frame   = 0
         subDir  = ""
-        for key,val in kwargs.iteritems():
+        for key,val in kwargs.items():
             if key == 'index':  index       = val 
             if key == 'frame':  frame       = val
             if key == 'subDir': str_subDir  = val
@@ -258,7 +255,7 @@ class med2image(object):
         frame           = 0
         indexStart      = -1
         indexStop       = -1
-        for key, val in kwargs.iteritems():
+        for key, val in kwargs.items():
             if key == 'dimension':  str_dim         = val
             if key == 'makeSubDir': b_makeSubDir    = val
             if key == 'frame':      frame           = val
@@ -303,7 +300,8 @@ class med2image(object):
 
         '''
         self._log('Outputfile = %s\n' % astr_outputFile)
-        pylab.imsave(astr_outputFile, self._Mnp_2Dslice, cmap = cm.Greys_r)
+        format = astr_outputFile.split('.')[-1]
+        pylab.imsave(astr_outputFile, self._Mnp_2Dslice, format=format, cmap = cm.Greys_r)
 
 
 class med2image_dcm(med2image):
@@ -341,7 +339,7 @@ class med2image_dcm(med2image):
                 #print('%s: %s\n' % (img, image.shape))
                 try:
                     self._Vnp_3DVol[:,:,i] = image
-                except Exception, e:
+                except Exception as e:
                     error.fatal(self, 'dcmInsertionFail', '\nFor input DICOM file %s\n%s\n' % (img, str(e)))
                 i += 1
         if self._str_outputFileStem.startswith('%'):
@@ -674,7 +672,7 @@ if __name__ == '__main__':
     if len(str_outputFileExtension):
         args.outputFileStem = str_outputFileStem
 
-    b_niftiExt           = (str_inputFileExtension   == '.nii'    or \
+    b_niftiExt           = (str_inputFileExtension   == '.nii'    or
                             str_inputFileExtension   == '.gz')
     b_dicomExt           =  str_inputFileExtension   == '.dcm'
     if b_niftiExt:

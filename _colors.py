@@ -3,7 +3,7 @@
 #
 # (c) 2012 FNNDSC, Boston Children's Hospital
 #
-import types
+
 
 class Colors( object ):
     '''
@@ -18,6 +18,14 @@ class Colors( object ):
     BLUE="\033[0;34m"
     PURPLE="\033[0;35m"
     CYAN="\033[0;36m"
+
+    BLINK_BLACK="\033[5;30m"
+    BLINK_RED="\033[5;31m"
+    BLINK_GREEN="\033[5;32m"
+    BLINK_BROWN="\033[5;33m"
+    BLINK_BLUE="\033[5;34m"
+    BLINK_PURPLE="\033[5;35m"
+    BLINK_CYAN="\033[5;36m"
 
     YELLOW="\033[1;33m"
     LIGHT_GRAY="\033[0;37m"
