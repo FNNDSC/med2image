@@ -6,3 +6,5 @@ docs/build
 htmlcov
 .docker
 .idea/
+dist/
+med2image.egg-info/
