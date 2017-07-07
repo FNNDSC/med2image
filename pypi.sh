@@ -8,9 +8,11 @@ G_SYNOPSIS="
 
  SYNOPSIS
 
-	pypi.sh <ver>
+	pypi.sh <name> <ver>
 
  ARGS
+ 	<name>
+	The repo name.
 
 	<ver>
 	A version string to upload. Typically something like '0.20.22'.
@@ -27,7 +29,8 @@ if (( $# != 1 )) ; then
     exit 1
 fi
 
-VER=$1
+NAME=$1
+VER=$2
 
 git commit -am "v${VER}"
 git push origin master
@@ -36,5 +39,5 @@ git push origin --tags
 
 rstcheck README.rst
 python3 setup.py sdist
-twine upload dist/pman-${VER}.tar.gz
+twine upload dist/${NAME}-${VER}.tar.gz
 
