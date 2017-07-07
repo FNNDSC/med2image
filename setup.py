@@ -14,7 +14,7 @@ setup(
       name             =   'med2image',
       version          =   '1.0.0',
       description      =   '(Python) utility to convert medical images to jpg and png',
-      long_description =   '(Python) utility to convert medical images to jpg and png',
+      long_description =   readme(),
       author           =   'FNNDSC',
       author_email     =   'dev@babymri.org',
       url              =   'https://github.com/FNNDSC/med2image',
