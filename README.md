@@ -6,21 +6,25 @@
 
 ## Overview
 
-<tt>med2image</tt> is a simple Python utility that converts medical image formatted files to more visual friendly ones, such as <tt>png</tt> and <tt>jpg</tt>.
+<tt>med2image</tt> is a simple Python3 utility that converts medical image formatted files to more visual friendly ones, such as <tt>png</tt> and <tt>jpg</tt>.
 
 Currently, NIfTI and DICOM input formats are understood, while any graphical output type that is supported by <tt>matplotlib</tt> can be generated.
 
 ## Dependencies
-Make sure that the following dependencies are installed on the host system:
+Make sure that the following dependencies are installed on your host system/python3 virtual env:
 
 * nibabel (to read NIfTI files)
 * pydicom (to read DICOM files)
 * matplotlib (to save data in various image formats)
 * pillow (to save data in jpg format)
 
-### FNNDSC script checkout
+### Installation
 
-An alternate method of installing this script and <b>some</b> of its internal dependencies (<tt>error.py, dgmsocket.py, message.py</tt>) is to checkout the FNNDSC github scripts repository, https://github.com/FNNDSC/scripts.
+The best method of installing this script and all of its dependencies is by fetching it from PyPI
+ 
+```python
+    pip3 install med2image
+```
 
 ## Command line arguments
 
@@ -94,13 +98,17 @@ Both 3D and 4D NIfTI input data are understood. In the case of 4D NIfTI, a speci
 ### All slices in a volume
 To convert <b>all</b> slices in an input NIfTI volume called <tt>vol.nii</tt>, to save the results in a directory called <tt>out</tt> and to use as output the file stem name <tt>image</tt>, do
 
- ```med2image.py -i vol.nii -d out -o image.jpg -s -1```
+ ```
+ med2image -i vol.nii -d out -o image.jpg -s -1
+ ```
 
 or equivalently and more verbosely,
 
-    med2image.py --inputFile vol.nii     --outputDir out      \
-                 --outputFileStem image  --outputFileType jpg \
-                 --sliceToConvert -1
+```
+med2image --inputFile vol.nii     --outputDir out      \
+          --outputFileStem image  --outputFileType jpg \
+          --sliceToConvert -1
+```
 
 This will create the following files in <tt>out</tt>
 
@@ -124,15 +132,15 @@ image-slice053.jpg
 ### Convert only a single slice
 Mostly, you'll probably only want to convert the "middle" slice in a volume (for example to generate a representative thumbnail of the volume). To do this, simply specify a <tt>m</tt> to <tt>--sliceToConvert</tt>
 
- ```med2image.py -i input.nii -o input.jpg -s m```
+ ```med2image -i input.nii -o input.jpg -s m```
 
 or, again, slightly more verbosely and with an outputDirectory specifier
 
- ```med2image.py -i input.nii -d out -o vol --outputFileType jpg --sliceToConvert m```
+ ```med2image -i input.nii -d out -o vol --outputFileType jpg --sliceToConvert m```
 
 Alternatively a specific slice index can be converted. Use
 
- ```med2image.py -i input.nii -d out -o vol --outputFileType jpg --sliceToConvert 20```
+ ```med2image -i input.nii -d out -o vol --outputFileType jpg --sliceToConvert 20```
 
 to convert only the 20th slice of the volume.
 
@@ -141,14 +149,14 @@ to convert only the 20th slice of the volume.
 ### Convert a single DICOM file
 To convert a single DICOM file called <tt>slice.dcm</tt> to <tt>slice.jpg</tt>, do:
 
-```med2image.py -i slice.dcm -o slice.jpg```
+```med2image -i slice.dcm -o slice.jpg```
 
 which will create a single file, <tt>slice.jpg</tt> in the current directory.
 
 ### Convert all DICOMS in a directory/series
 To convert all the DICOMS in a directory, simply specifiy a '-1' to the sliceIndex:
 
-```med2image.py -i inputDir/slice.dcm -d outputDir -o slice.jpg -s -1```
+```med2image -i inputDir/slice.dcm -d outputDir -o slice.jpg -s -1```
 
 Note that this assumes all the DICOM files in the directory <tt>inputDir</tt> belong to the same series.
 
