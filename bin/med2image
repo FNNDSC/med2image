@@ -113,6 +113,8 @@ if b_niftiExt:
         reslice=args.reslice
     )
 
+    print('sliceToConvert:', args.sliceToConvert)
+
 if b_dicomExt:
     C_convert = med2image.med2image_dcm(
         inputFile=args.inputFile,
