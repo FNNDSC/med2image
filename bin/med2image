@@ -77,9 +77,9 @@ args = parser.parse_args()
 
 if args.man or args.synopsis:
     if args.man:
-        str_help = synopsis(False)
+        str_help = med2image.synopsis(False)
     else:
-        str_help = synopsis(True)
+        str_help = med2image.synopsis(True)
     print(str_help)
     sys.exit(1)
 
