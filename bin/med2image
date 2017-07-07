@@ -22,6 +22,7 @@ sys.path.insert(1, os.path.join(os.path.dirname(__file__), '..'))
 import argparse
 from med2image import med2image
 
+str_version = "1.0.0"
 #import pdb; pdb.set_trace()
 parser = argparse.ArgumentParser(
     description="med2view converts an input medical image file to a more conventional graphical format.")
@@ -73,7 +74,18 @@ parser.add_argument("-y", "--synopsis",
                     dest='synopsis',
                     action='store_true',
                     default=False)
+parser.add_argument('-v', '--version',
+                    help    = 'if specified, print version number',
+                    dest    = 'b_version',
+                    action  = 'store_true',
+                    default = False)
+
+
 args = parser.parse_args()
+
+if args.b_version:
+    print("Version: %s" % str_version)
+    sys.exit(1)
 
 if args.man or args.synopsis:
     if args.man:
