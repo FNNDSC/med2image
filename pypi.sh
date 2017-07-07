@@ -24,7 +24,7 @@ G_SYNOPSIS="
 
 "
 
-if (( $# != 1 )) ; then
+if (( $# != 2 )) ; then
     echo "$G_SYNOPSIS"
     exit 1
 fi
