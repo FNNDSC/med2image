@@ -22,7 +22,7 @@ Make sure that the following dependencies are installed on your host system/pyth
 
 The best method of installing this script and all of its dependencies is by fetching it from PyPI
  
-```python
+```bash
     pip3 install med2image
 ```
 

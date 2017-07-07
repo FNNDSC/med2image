@@ -32,7 +32,7 @@ Installation
 The best method of installing this script and all of its dependencies is
 by fetching it from PyPI
 
-.. code:: python
+.. code:: bash
 
         pip3 install med2image
 
