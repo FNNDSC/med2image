@@ -18,6 +18,7 @@ import os
 import glob
 import numpy as np
 import re
+import copy
 
 # System dependency imports
 import nibabel as nib
@@ -144,7 +145,7 @@ class med2image(object):
         self._b_convertMiddleSlice      = False
         self._b_convertMiddleFrame      = False
         self._b_reslice                 = False
-        self.saveIntensitiesInverted    = False
+        self.func                       = None #transformation function
 
         for key, value in kwargs.items():
             if key == "inputFile":          self._str_inputFile         = value
@@ -299,9 +300,18 @@ class med2image(object):
         self._log('Outputfile = %s\n' % astr_outputFile)
         format = astr_outputFile.split('.')[-1]
         slice = self._Mnp_2Dslice
-        if self.saveIntensitiesInverted:
+        if self.func=='invertIntensities':
             slice = self.get_inverted_slice()
-        pylab.imsave(astr_outputFile, slice, format=format, cmap = cm.Greys_r)
+        if format == 'dcm':
+            if self._dcm:
+                dcm = copy.deepcopy(self._dcm)
+                dcm.pixel_array.flat = slice.flat
+                dcm.PixelData = dcm.pixel_array.tostring()
+                dcm.save_as(astr_outputFile)
+            else:
+                raise ValueError('dcm output format only available for DICOM files')
+        else:
+            pylab.imsave(astr_outputFile, slice, format=format, cmap = cm.Greys_r)
 
     def get_inverted_slice(self):
         '''

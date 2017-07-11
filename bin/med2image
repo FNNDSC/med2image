@@ -66,11 +66,9 @@ parser.add_argument('--showSlices',
                     dest='showSlices',
                     action='store_true',
                     default=False)
-parser.add_argument('--saveIntensitiesInverted',
-                    help="save slices with the pixel intensities inverted",
-                    dest='saveIntensitiesInverted',
-                    action='store_true',
-                    default=False)
+parser.add_argument('--func',
+                    help="apply transformation function before saving",
+                    dest='func')
 parser.add_argument("-x", "--man",
                     help="man",
                     dest='man',
@@ -104,7 +102,7 @@ def synopsis(ab_shortOnly=False):
                     [-s|--sliceToConvert <sliceToConvert>] \\
                     [-f|--frameToConvert <frameToConvert>] \\
                     [--showSlices]                         \\
-                    [--saveIntensitiesInverted]            \\
+                    [--func {invertIntensities}]            \\
                     [--reslice]                            \\
                     [-x|--man]				   \\
 		    [-y|--synopsis]
@@ -176,8 +174,8 @@ def synopsis(ab_shortOnly=False):
         [--showSlices]
         If specified, render/show image slices as they are created.
         
-        [--saveIntensitiesInverted]
-        If specified, save image slices with the pixel intensities inverted.
+        [--func {invertIntensities}]
+        Apply the specified transformation function before saving.
 
         [--reslice]
         For 3D data only. Assuming [i,j,k] coordinates, the default is to save
@@ -290,8 +288,8 @@ if b_dicomExt:
         reslice=args.reslice
     )
 
-if args.saveIntensitiesInverted:
-    C_convert.saveIntensitiesInverted = True
+if args.func:
+    C_convert.func = args.func
 
 # And now run it!
 med2image.misc.tic()
