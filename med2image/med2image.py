@@ -18,7 +18,6 @@ import os
 import glob
 import numpy as np
 import re
-import copy
 
 # System dependency imports
 import nibabel as nib
@@ -135,6 +134,7 @@ class med2image(object):
         self._Vnp_3DVol                 = None
         self._Mnp_2Dslice               = None
         self._dcm                       = None
+        self._dcmList                   = []
 
         # A logger
         self._log                       = msg.Message()
@@ -219,10 +219,10 @@ class med2image(object):
         else:
             return self._str_workingDir
 
-    def dim_sliceSave(self, **kwargs):
+    def get_output_file_name(self, **kwargs):
         index   = 0
         frame   = 0
-        subDir  = ""
+        str_subDir  = ""
         for key,val in kwargs.items():
             if key == 'index':  index       = val 
             if key == 'frame':  frame       = val
@@ -242,7 +242,7 @@ class med2image(object):
                                         self._str_outputFileStem,
                                         index,
                                         self._str_outputFileType)
-        self.slice_save(str_outputFile)
+        return str_outputFile
 
     def dim_save(self, **kwargs):
         dims            = self._Vnp_3DVol.shape
@@ -250,13 +250,11 @@ class med2image(object):
         str_dim         = 'z'
         b_makeSubDir    = False
         b_rot90         = False
-        frame           = 0
         indexStart      = -1
         indexStop       = -1
         for key, val in kwargs.items():
             if key == 'dimension':  str_dim         = val
             if key == 'makeSubDir': b_makeSubDir    = val
-            if key == 'frame':      frame           = val
             if key == 'indexStart': indexStart      = val 
             if key == 'indexStop':  indexStop       = val
             if key == 'rot90':      b_rot90         = val
@@ -265,60 +263,59 @@ class med2image(object):
         if b_makeSubDir: 
             str_subDir = str_dim
             misc.mkdir('%s/%s' % (self._str_outputDir, str_subDir))
-        if str_dim == 'x':
-            if indexStart == 0 and indexStop == -1:
-                indexStop  = dims[0]
-            for i in range(indexStart, indexStop):
-                self._Mnp_2Dslice = self._Vnp_3DVol[i,:,:]
-                if b_rot90: self._Mnp_2Dslice = np.rot90(self._Mnp_2Dslice)
-                self.dim_sliceSave(index = i, subDir = str_subDir)
-        if str_dim == 'y':
-            if indexStart == 0 and indexStop == -1:
-                indexStop  = dims[1]
-            for j in range(indexStart, indexStop):
-                self._Mnp_2Dslice = self._Vnp_3DVol[:,j,:]
-                if b_rot90: self._Mnp_2Dslice = np.rot90(self._Mnp_2Dslice)
-                self.dim_sliceSave(index = j, subDir = str_subDir)
-        if str_dim == 'z':
-            if indexStart == 0 and indexStop == -1:
-                indexStop  = dims[2]
-            for k in range(indexStart, indexStop):
-                self._Mnp_2Dslice = self._Vnp_3DVol[:,:,k]
-                if b_rot90: self._Mnp_2Dslice = np.rot90(self._Mnp_2Dslice)
-                self.dim_sliceSave(index = k, subDir = str_subDir)
+
+        dim_ix = {'x':0, 'y':1, 'z':2}
+        if indexStart == 0 and indexStop == -1:
+            indexStop = dims[dim_ix[str_dim]]
+
+        for i in range(indexStart, indexStop):
+            if str_dim == 'x':
+                self._Mnp_2Dslice = self._Vnp_3DVol[i, :, :]
+            elif str_dim == 'y':
+                self._Mnp_2Dslice = self._Vnp_3DVol[:, i, :]
+            else:
+                self._Mnp_2Dslice = self._Vnp_3DVol[:, :, i]
+            self.process_slice(b_rot90)
+            str_outputFile = self.get_output_file_name(index=i, subDir=str_subDir)
+            if str_outputFile.endswith('dcm'):
+                self._dcm = self._dcmList[i]
+            self.slice_save(str_outputFile)
+
+    def process_slice(self, b_rot90=None):
+        '''
+        Processes a single slice.
+        '''
+        if b_rot90:
+            self._Mnp_2Dslice = np.rot90(self._Mnp_2Dslice)
+        if self.func == 'invertIntensities':
+            self.invert_slice_intensities()
 
     def slice_save(self, astr_outputFile):
         '''
-        Processes/saves a single slice.
+        Saves a single slice.
 
         ARGS
 
         o astr_output
         The output filename to save the slice to.
-
         '''
         self._log('Outputfile = %s\n' % astr_outputFile)
-        format = astr_outputFile.split('.')[-1]
-        slice = self._Mnp_2Dslice
-        if self.func=='invertIntensities':
-            slice = self.get_inverted_slice()
-        if format == 'dcm':
+        fformat = astr_outputFile.split('.')[-1]
+        if fformat == 'dcm':
             if self._dcm:
-                dcm = copy.deepcopy(self._dcm)
-                dcm.pixel_array.flat = slice.flat
-                dcm.PixelData = dcm.pixel_array.tostring()
-                dcm.save_as(astr_outputFile)
+                self._dcm.pixel_array.flat = self._Mnp_2Dslice.flat
+                self._dcm.PixelData = self._dcm.pixel_array.tostring()
+                self._dcm.save_as(astr_outputFile)
             else:
                 raise ValueError('dcm output format only available for DICOM files')
         else:
-            pylab.imsave(astr_outputFile, slice, format=format, cmap = cm.Greys_r)
+            pylab.imsave(astr_outputFile, self._Mnp_2Dslice, format=fformat, cmap = cm.Greys_r)
 
-    def get_inverted_slice(self):
+    def invert_slice_intensities(self):
         '''
-        Returns an intensity-inverted copy of a single slice.
+        Inverts intensities of a single slice.
         '''
-        return self._Mnp_2Dslice*(-1) + self._Mnp_2Dslice.max()
-
+        self._Mnp_2Dslice = self._Mnp_2Dslice*(-1) + self._Mnp_2Dslice.max()
 
 
 class med2image_dcm(med2image):
@@ -335,11 +332,11 @@ class med2image_dcm(med2image):
             self._sliceToConvert = int(self.slices/2)
             self._dcm            = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert],force=True)
             self._str_inputFile  = self.l_dcmFileNames[self._sliceToConvert]
-            str_outputFile       = self.l_dcmFileNames[self._sliceToConvert]
             if not self._str_outputFileStem.startswith('%'):
                 self._str_outputFileStem, ext = os.path.splitext(self.l_dcmFileNames[self._sliceToConvert])
         if not self._b_convertMiddleSlice and self._sliceToConvert != -1:
             self._dcm = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert],force=True)
+            self._str_inputFile = self.l_dcmFileNames[self._sliceToConvert]
         else:
             self._dcm = dicom.read_file(self._str_inputFile,force=True)
         if self._sliceToConvert == -1:
@@ -353,6 +350,7 @@ class med2image_dcm(med2image):
             for img in self.l_dcmFileNames:
                 self._dcm = dicom.read_file(img,force=True)
                 image = self._dcm.pixel_array
+                self._dcmList.append(self._dcm)
                 #print('%s: %s\n' % (img, image.shape))
                 try:
                     self._Vnp_3DVol[:,:,i] = image
@@ -397,6 +395,7 @@ class med2image_dcm(med2image):
             str_outputFile = '%s/%s.%s' % (self._str_outputDir,
                                         self._str_outputFileStem,
                                         self._str_outputFileType)
+            self.process_slice()
             self.slice_save(str_outputFile)
         if self._b_3D:
             rotCount = 0
