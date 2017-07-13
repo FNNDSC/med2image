@@ -22,7 +22,7 @@ sys.path.insert(1, os.path.join(os.path.dirname(__file__), '..'))
 import argparse
 from med2image import med2image
 
-str_version = "1.0.1"
+str_version = "1.0.4"
 #import pdb; pdb.set_trace()
 
 #define script arguments
