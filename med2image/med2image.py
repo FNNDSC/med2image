@@ -51,8 +51,31 @@ class med2image(object):
         'dcmInsertionFail': {
             'action'        : 'attempting insert DICOM into volume structure, ',
             'error'         : 'a dimension mismatch occurred. This DICOM file is of different image size to the rest.',
-            'exitCode'      : 20
-            }
+            'exitCode'      : 20},
+        'ProtocolNameTag': {
+            'action'        : 'attempting to parse DICOM header, ',
+            'error'         : 'the DICOM file does not seem to contain a ProtocolName tag.',
+            'exitCode'      : 30},
+        'PatientNameTag': {
+            'action': 'attempting to parse DICOM header, ',
+            'error': 'the DICOM file does not seem to contain a PatientName tag.',
+            'exitCode': 30},
+        'PatientAgeTag': {
+            'action': 'attempting to parse DICOM header, ',
+            'error': 'the DICOM file does not seem to contain a PatientAge tag.',
+            'exitCode': 30},
+        'PatientNameSex': {
+            'action': 'attempting to parse DICOM header, ',
+            'error': 'the DICOM file does not seem to contain a PatientSex tag.',
+            'exitCode': 30},
+        'PatientIDTag': {
+            'action': 'attempting to parse DICOM header, ',
+            'error': 'the DICOM file does not seem to contain a PatientID tag.',
+            'exitCode': 30},
+        'SeriesDescriptionTag': {
+            'action': 'attempting to parse DICOM header, ',
+            'error': 'the DICOM file does not seem to contain a SeriesDescription tag.',
+            'exitCode': 30}
     }
         
     def log(self, *args):
@@ -379,13 +402,39 @@ class med2image_dcm(med2image):
         '''
         Runs the DICOM conversion based on internal state.
         '''
+
         self._log('Converting DICOM image.\n')
-        self._log('PatientName:                                %s\n' % self._dcm.PatientName)
-        self._log('PatientAge:                                 %s\n' % self._dcm.PatientAge)
-        self._log('PatientSex:                                 %s\n' % self._dcm.PatientSex)
-        self._log('PatientID:                                  %s\n' % self._dcm.PatientID)
-        self._log('SeriesDescription:                          %s\n' % self._dcm.SeriesDescription)
-        self._log('ProtocolName:                               %s\n' % self._dcm.ProtocolName)
+        try:
+            self._log('PatientName:                                %s\n' % self._dcm.PatientName)
+        except AttributeError:
+            self._log('PatientName:                                %s\n' % 'PatientName not found in DCM header.')
+            error.warn(self, 'PatientNameTag')
+        try:
+            self._log('PatientAge:                                 %s\n' % self._dcm.PatientAge)
+        except AttributeError:
+            self._log('PatientAge:                                 %s\n' % 'PatientAge not found in DCM header.')
+            error.warn(self, 'PatientAgeTag')
+        try:
+            self._log('PatientSex:                                 %s\n' % self._dcm.PatientSex)
+        except AttributeError:
+            self._log('PatientSex:                                 %s\n' % 'PatientSex not found in DCM header.')
+            error.warn(self, 'PatientSexTag')
+        try:
+            self._log('PatientID:                                  %s\n' % self._dcm.PatientID)
+        except AttributeError:
+            self._log('PatientID:                                  %s\n' % 'PatientID not found in DCM header.')
+            error.warn(self, 'PatientIDTag')
+        try:
+            self._log('SeriesDescription:                          %s\n' % self._dcm.SeriesDescription)
+        except AttributeError:
+            self._log('SeriesDescription:                          %s\n' % 'SeriesDescription not found in DCM header.')
+            error.warn(self, 'SeriesDescriptionTag')
+        try:
+            self._log('ProtocolName:                               %s\n' % self._dcm.ProtocolName)
+        except AttributeError:
+            self._log('ProtocolName:                               %s\n' % 'ProtocolName not found in DCM header.')
+            error.warn(self, 'ProtocolNameTag')
+
         if self._b_convertMiddleSlice:
             self._log('Converting middle slice in DICOM series:    %d\n' % self._sliceToConvert)
 
@@ -405,6 +454,7 @@ class med2image_dcm(med2image):
                     rotCount += 1
             else:
                 self.dim_save(dimension = 'z', makeSubDir = False, rot90 = False, indexStart = 0, indexStop = -1)
+
                 
 class med2image_nii(med2image):
     '''
