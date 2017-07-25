@@ -398,11 +398,25 @@ class med2image_dcm(med2image):
         image = self._dcm.pixel_array
         self._Mnp_2Dslice = image
 
+    def sanitize(value):
+        # convert to string and remove trailing spaces
+        tvalue = str(value).strip()
+        # only keep alpha numeric characters and replace the rest by "_"
+        svalue = "".join(character if character.isalnum() else '.' for character in tvalue)
+        if not svalue:
+            svalue = "no value provided"
+        return svalue
+
+    def processDicomField(self, dcm, field):
+        value = "no value provided"
+        if field in dcm:
+            value = self.sanitize(dcm.data_element(field).value)
+        return value
+
     def run(self):
         '''
         Runs the DICOM conversion based on internal state.
         '''
-
         self._log('Converting DICOM image.\n')
         try:
             self._log('PatientName:                                %s\n' % self._dcm.PatientName)
