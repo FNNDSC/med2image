@@ -275,13 +275,15 @@ class med2image(object):
         b_rot90         = False
         indexStart      = -1
         indexStop       = -1
+        frame           = 0
         for key, val in kwargs.items():
             if key == 'dimension':  str_dim         = val
             if key == 'makeSubDir': b_makeSubDir    = val
             if key == 'indexStart': indexStart      = val 
             if key == 'indexStop':  indexStop       = val
             if key == 'rot90':      b_rot90         = val
-        
+            if key == 'frame':      frame           = val
+
         str_subDir  = ''
         if b_makeSubDir: 
             str_subDir = str_dim
@@ -299,7 +301,7 @@ class med2image(object):
             else:
                 self._Mnp_2Dslice = self._Vnp_3DVol[:, :, i]
             self.process_slice(b_rot90)
-            str_outputFile = self.get_output_file_name(index=i, subDir=str_subDir)
+            str_outputFile = self.get_output_file_name(index=i, subDir=str_subDir, frame=frame)
             if str_outputFile.endswith('dcm'):
                 self._dcm = self._dcmList[i]
             self.slice_save(str_outputFile)
@@ -532,9 +534,9 @@ class med2image_nii(med2image):
             misc.mkdir(self._str_outputDir)
             if self._b_reslice:
                 for dim in ['x', 'y', 'z']:
-                    self.dim_save(dimension = dim, makeSubDir = True, indexStart = sliceStart, indexStop = sliceEnd, rot90 = True)
+                    self.dim_save(dimension = dim, makeSubDir = True, indexStart = sliceStart, indexStop = sliceEnd, rot90 = True, frame = f)
             else:
-                self.dim_save(dimension = 'z', makeSubDir = False, indexStart = sliceStart, indexStop = sliceEnd, rot90 = True)
+                self.dim_save(dimension = 'z', makeSubDir = False, indexStart = sliceStart, indexStop = sliceEnd, rot90 = True, frame = f)
 
 
 
