@@ -36,8 +36,7 @@ by fetching it from PyPI
 
         pip3 install med2image
 
-You migh get an error about `python3-tk` not installed. So you should install that package.
-For example on Ubuntu:
+Should you get an error about `python3-tk` not installed, simply do (for example on Ubuntu):
 
 .. code:: bash
 
