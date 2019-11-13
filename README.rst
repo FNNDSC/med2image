@@ -9,7 +9,7 @@ Quick Overview
 Overview
 --------
 
-med2image is a simple Python3 utility that converts medical image
+`med2image` is a simple Python3 utility that converts medical image
 formatted files to more visual friendly ones, such as png and jpg.
 
 Currently, NIfTI and DICOM input formats are understood, while any
@@ -19,12 +19,12 @@ Dependencies
 ------------
 
 Make sure that the following dependencies are installed on your host
-system/python3 virtual env:
+system (or even better, a python3 virtual env):
 
--  nibabel (to read NIfTI files)
--  pydicom (to read DICOM files)
--  matplotlib (to save data in various image formats)
--  pillow (to save data in jpg format)
+-  `nibabel` (to read NIfTI files)
+-  `pydicom` (to read DICOM files)
+-  `matplotlib` (to save data in various image formats)
+-  `pillow` (to save data in jpg format)
 
 Installation
 ~~~~~~~~~~~~
