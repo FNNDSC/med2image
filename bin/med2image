@@ -18,7 +18,7 @@ from    med2image           import med2image
 from    argparse            import RawTextHelpFormatter
 from    argparse            import ArgumentParser
 from    pfmisc._colors      import Colors
-
+import  pudb
 
 
 str_version = "2.0.1"
@@ -205,56 +205,61 @@ def synopsis(ab_shortOnly=False):
 parser  = ArgumentParser(description = str_desc, formatter_class = RawTextHelpFormatter)
 
 parser.add_argument("-i", "--inputFile",
-                    help="input file",
-                    dest='inputFile')
+                    help    = "input file",
+                    dest    = 'inputFile')
+parser.add_argument("-I", "--inputDir",
+                    help    = "input directory",
+                    dest    = 'inputDir',
+                    default = '')
 parser.add_argument("-o", "--outputFileStem",
-                    help="output file",
-                    default="output.jpg",
-                    dest='outputFileStem')
+                    help    = "output file",
+                    default = "output.jpg",
+                    dest    = 'outputFileStem')
 parser.add_argument("-d", "--outputDir",
-                    help="output image directory",
-                    dest='outputDir',
-                    default='.')
+                    help    = "output image directory",
+                    dest    = 'outputDir',
+                    default = '.')
 parser.add_argument("-t", "--outputFileType",
-                    help="output image type",
-                    dest='outputFileType',
-                    default='')
+                    help    = "output image type",
+                    dest    = 'outputFileType',
+                    default = '')
 parser.add_argument("-s", "--sliceToConvert",
                     help="slice to convert (for 3D data)",
                     dest='sliceToConvert',
                     default='-1')
 parser.add_argument("-f", "--frameToConvert",
-                    help="frame to convert (for 4D data)",
-                    dest='frameToConvert',
-                    default='-1')
+                    help    = "frame to convert (for 4D data)",
+                    dest    = 'frameToConvert',
+                    default = '-1')
 parser.add_argument("--printElapsedTime",
-                    help="print program run time",
-                    dest='printElapsedTime',
-                    action='store_true',
-                    default=False)
+                    help    = "print program run time",
+                    dest    = 'printElapsedTime',
+                    action  = 'store_true',
+                    default = False)
 parser.add_argument('-r', '--reslice',
-                    help="save images along i,j,k directions -- 3D input only",
-                    dest='reslice',
-                    action='store_true',
-                    default=False)
+                    help    = "save images along i,j,k directions -- 3D input only",
+                    dest    = 'reslice',
+                    action  = 'store_true',
+                    default = False)
 parser.add_argument('--showSlices',
-                    help="show slices that are converted",
-                    dest='showSlices',
-                    action='store_true',
-                    default=False)
+                    help    = "show slices that are converted",
+                    dest    = 'showSlices',
+                    action  = 'store_true',
+                    default = False)
 parser.add_argument('--func',
-                    help="apply transformation function before saving",
-                    dest='func')
+                    help    = "apply transformation function before saving",
+                    dest    = 'func',
+                    default = "")
 parser.add_argument("-x", "--man",
-                    help="man",
-                    dest='man',
-                    action='store_true',
-                    default=False)
+                    help    = "man",
+                    dest    = 'man',
+                    action  = 'store_true',
+                    default = False)
 parser.add_argument("-y", "--synopsis",
-                    help="short synopsis",
-                    dest='synopsis',
-                    action='store_true',
-                    default=False)
+                    help    = "short synopsis",
+                    dest    = 'synopsis',
+                    action  = 'store_true',
+                    default = False)
 parser.add_argument('-v', '--version',
                     help    = 'if specified, print version number',
                     dest    = 'b_version',
@@ -278,54 +283,15 @@ if args.man or args.synopsis:
     print(str_help)
     sys.exit(1)
 
-str_outputFileStem, str_outputFileExtension = os.path.splitext(args.outputFileStem)
-if len(str_outputFileExtension):
-    str_outputFileExtension = str_outputFileExtension.split('.')[1]
-try:
-    str_inputFileStem, str_inputFileExtension = os.path.splitext(args.inputFile)
-except:
-    print(synopsis(False))
-    sys.exit(1)
-
-if not len(args.outputFileType) and len(str_outputFileExtension):
-    args.outputFileType = str_outputFileExtension
-
-if len(str_outputFileExtension):
-    args.outputFileStem = str_outputFileStem
-
-b_niftiExt = (str_inputFileExtension == '.nii' or
-              str_inputFileExtension == '.gz')
-b_dicomExt = str_inputFileExtension == '.dcm'
-if b_niftiExt:
-    C_convert = med2image.med2image_nii(
-        inputFile=args.inputFile,
-        outputDir=args.outputDir,
-        outputFileStem=args.outputFileStem,
-        outputFileType=args.outputFileType,
-        sliceToConvert=args.sliceToConvert,
-        frameToConvert=args.frameToConvert,
-        showSlices=args.showSlices,
-        reslice=args.reslice
-    )
-
-    print('sliceToConvert:', args.sliceToConvert)
-
-if b_dicomExt:
-    C_convert = med2image.med2image_dcm(
-        inputFile=args.inputFile,
-        outputDir=args.outputDir,
-        outputFileStem=args.outputFileStem,
-        outputFileType=args.outputFileType,
-        sliceToConvert=args.sliceToConvert,
-        reslice=args.reslice
-    )
+imgConverter    = med2image.object_factoryCreate(args).C_convert
 
 if args.func:
-    C_convert.func = args.func
+    imgConverter.func = args.func
 
+# pudb.set_trace()
 # And now run it!
-C_convert.tic()
-C_convert.run()
-if args.printElapsedTime: print("Elapsed time = %f seconds" % C_convert.toc())
+imgConverter.tic()
+imgConverter.run()
+if args.printElapsedTime: print("Elapsed time = %f seconds" % imgConverter.toc())
 sys.exit(0)
 
