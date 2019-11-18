@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
 # System imports
-import os
-import glob
-import numpy as np
-import re
-import time
+import  os
+import  sys
+import  glob
+import  numpy as np
+import  re
+import  time
+import  pudb
 
 # System dependency imports
 import nibabel             as  nib
@@ -56,8 +58,8 @@ def report(     callingClass,
     log( Colors.LIGHT_CYAN + ("%s" % caller) + Colors.NO_COLOUR)
     log( ">\n")
 
-    log( "\tWhile %s\n" % callingClass._dictErr[astr_key]['action'] )
-    log( "\t%s\n" % callingClass._dictErr[astr_key]['error'] )
+    log( "\tWhile %s" % callingClass._dictErr[astr_key]['action'] )
+    log( "\t%s" % callingClass._dictErr[astr_key]['error'] )
     log( "\n" )
     if ab_exitToOs:
         log( "Returning to system with error code %d\n" % \
@@ -177,9 +179,9 @@ class med2image(object):
         Get / set internal object description.
         '''
         if len(args):
-            self._str_desc = args[0]
+            self.str_desc = args[0]
         else:
-            return self._str_desc
+            return self.str_desc
 
     @staticmethod
     def urlify(astr, astr_join = '_'):
@@ -196,27 +198,27 @@ class med2image(object):
         #
         # Object desc block
         #
-        self._str_desc                  = ''
+        self.str_desc                  = ''
         # self._log                       = msg.Message()
         # self._log._b_syslog             = True
         self.__name__                   = "med2image"
 
         # Directory and filenames
-        self._str_workingDir            = ''
-        self._str_inputFile             = ''
-        self._str_outputFileStem        = ''
-        self._str_outputFileType        = ''
-        self._str_outputDir             = ''
-        self._str_inputDir              = ''
+        self.str_workingDir            = ''
+        self.str_inputFile             = ''
+        self.str_outputFileStem        = ''
+        self.str_outputFileType        = ''
+        self.str_outputDir             = ''
+        self.str_inputDir              = ''
 
         self._b_convertAllSlices        = False
-        self._str_sliceToConvert        = ''
-        self._str_frameToConvert        = ''
+        self.str_sliceToConvert        = ''
+        self.str_frameToConvert        = ''
         self._sliceToConvert            = -1
         self._frameToConvert            = -1
 
-        self._str_stdout                = ""
-        self._str_stderr                = ""
+        self.str_stdout                = ""
+        self.str_stderr                = ""
         self._exitCode                  = 0
 
         # The actual data volume and slice
@@ -250,36 +252,41 @@ class med2image(object):
         self.func                       = None #transformation function
 
         for key, value in kwargs.items():
-            if key == "inputFile":          self._str_inputFile         = value
-            if key == "outputDir":          self._str_outputDir         = value
-            if key == "outputFileStem":     self._str_outputFileStem    = value
-            if key == "outputFileType":     self._str_outputFileType    = value
-            if key == "sliceToConvert":     self._str_sliceToConvert    = value
-            if key == "frameToConvert":     self._str_frameToConvert    = value
+            if key == "inputFile":          self.str_inputFile         = value
+            if key == "inputDir":           self.str_inputDir          = value
+            if key == "outputDir":          self.str_outputDir         = value
+            if key == "outputFileStem":     self.str_outputFileStem    = value
+            if key == "outputFileType":     self.str_outputFileType    = value
+            if key == "sliceToConvert":     self.str_sliceToConvert    = value
+            if key == "frameToConvert":     self.str_frameToConvert    = value
             if key == "showSlices":         self._b_showSlices          = value
             if key == 'reslice':            self._b_reslice             = value
+            if key == "func":               self.func                   = value
 
-        if self._str_frameToConvert.lower() == 'm':
+        if self.str_frameToConvert.lower() == 'm':
             self._b_convertMiddleFrame = True
-        elif len(self._str_frameToConvert):
-            self._frameToConvert = int(self._str_frameToConvert)
+        elif len(self.str_frameToConvert):
+            self._frameToConvert = int(self.str_frameToConvert)
 
-        if self._str_sliceToConvert.lower() == 'm':
+        if self.str_sliceToConvert.lower() == 'm':
             self._b_convertMiddleSlice = True
-        elif len(self._str_sliceToConvert):
-            self._sliceToConvert = int(self._str_sliceToConvert)
+        elif len(self.str_sliceToConvert):
+            self._sliceToConvert = int(self.str_sliceToConvert)
 
-        self._str_inputDir               = os.path.dirname(self._str_inputFile)
-        if not len(self._str_inputDir): self._str_inputDir = '.'
-        str_fileName, str_fileExtension  = os.path.splitext(self._str_outputFileStem)
-        if len(self._str_outputFileType):
-            str_fileExtension            = '.%s' % self._str_outputFileType
+        if len(self.str_inputDir):
+            self.str_inputFile  = '%s/%s' % (self.str_inputDir, self.str_inputFile)
+        if not len(self.str_inputDir): 
+            self.str_inputDir = os.path.dirname(self.str_inputFile)
+        if not len(self.str_inputDir): self.str_inputDir = '.'
+        str_fileName, str_fileExtension  = os.path.splitext(self.str_outputFileStem)
+        if len(self.str_outputFileType):
+            str_fileExtension            = '.%s' % self.str_outputFileType
 
-        if len(str_fileExtension) and not len(self._str_outputFileType):
-            self._str_outputFileType     = str_fileExtension
+        if len(str_fileExtension) and not len(self.str_outputFileType):
+            self.str_outputFileType     = str_fileExtension
 
-        if not len(self._str_outputFileType) and not len(str_fileExtension):
-            self._str_outputFileType     = '.png'
+        if not len(self.str_outputFileType) and not len(str_fileExtension):
+            self.str_outputFileType     = '.png'
 
     def tic(self):
         """
@@ -299,7 +306,7 @@ class med2image(object):
         """
         global Gtic_start
         f_elapsedTime = time.time() - Gtic_start
-        for key, value in kwargs.iteritems():
+        for key, value in kwargs.items():
             if key == 'sysprint':   return value % f_elapsedTime
             if key == 'default':    return "Elapsed time = %f seconds." % f_elapsedTime
         return f_elapsedTime
@@ -320,10 +327,10 @@ class med2image(object):
             self._b_echoStdOut  = args[0]
 
     def stdout(self):
-        return self._str_stdout
+        return self.str_stdout
 
     def stderr(self):
-        return self._str_stderr
+        return self.str_stderr
 
     def exitCode(self):
         return self._exitCode
@@ -340,9 +347,9 @@ class med2image(object):
 
     def workingDir(self, *args):
         if len(args):
-            self._str_workingDir = args[0]
+            self.str_workingDir = args[0]
         else:
-            return self._str_workingDir
+            return self.str_workingDir
 
     def get_output_file_name(self, **kwargs):
         index   = 0
@@ -355,23 +362,23 @@ class med2image(object):
         
         if self._b_4D:
             str_outputFile = '%s/%s/%s-frame%03d-slice%03d.%s' % (
-                                                    self._str_outputDir,
+                                                    self.str_outputDir,
                                                     str_subDir,
-                                                    self._str_outputFileStem,
+                                                    self.str_outputFileStem,
                                                     frame, index,
-                                                    self._str_outputFileType)
+                                                    self.str_outputFileType)
         else:
             str_outputFile = '%s/%s/%s-slice%03d.%s' % (
-                                        self._str_outputDir,
+                                        self.str_outputDir,
                                         str_subDir,
-                                        self._str_outputFileStem,
+                                        self.str_outputFileStem,
                                         index,
-                                        self._str_outputFileType)
+                                        self.str_outputFileType)
         return str_outputFile
 
     def dim_save(self, **kwargs):
         dims            = self._Vnp_3DVol.shape
-        self.dp.qprint('Image volume logical (i, j, k) size: %s\n' % str(dims))
+        self.dp.qprint('Image volume logical (i, j, k) size: %s' % str(dims))
         str_dim         = 'z'
         b_makeSubDir    = False
         b_rot90         = False
@@ -389,7 +396,7 @@ class med2image(object):
         str_subDir  = ''
         if b_makeSubDir: 
             str_subDir = str_dim
-            med2image.mkdir('%s/%s' % (self._str_outputDir, str_subDir))
+            med2image.mkdir('%s/%s' % (self.str_outputDir, str_subDir))
 
         dim_ix = {'x':0, 'y':1, 'z':2}
         if indexStart == 0 and indexStop == -1:
@@ -426,7 +433,7 @@ class med2image(object):
         o astr_output
         The output filename to save the slice to.
         '''
-        self.dp.qprint('Outputfile = %s\n' % astr_outputFile)
+        self.dp.qprint('Outputfile = %s' % astr_outputFile)
         fformat = astr_outputFile.split('.')[-1]
         if fformat == 'dcm':
             if self._dcm:
@@ -448,10 +455,10 @@ class med2image(object):
 class med2image_dcm(med2image):
 
     def tic(self):
-        super()
+        return super().tic()
 
     def toc(self):
-        super()
+        return super().toc()
 
     '''
     Sub class that handles DICOM data.
@@ -459,23 +466,23 @@ class med2image_dcm(med2image):
     def __init__(self, **kwargs):
         med2image.__init__(self, **kwargs)
 
-        self.l_dcmFileNames = sorted(glob.glob('%s/*.dcm' % self._str_inputDir))
+        self.l_dcmFileNames = sorted(glob.glob('%s/*.dcm' % self.str_inputDir))
         self.slices         = len(self.l_dcmFileNames)
 
         if self._b_convertMiddleSlice:
             self._sliceToConvert = int(self.slices/2)
             self._dcm            = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert],force=True)
-            self._str_inputFile  = self.l_dcmFileNames[self._sliceToConvert]
-            if not self._str_outputFileStem.startswith('%'):
-                self._str_outputFileStem, ext = os.path.splitext(self.l_dcmFileNames[self._sliceToConvert])
+            self.str_inputFile  = self.l_dcmFileNames[self._sliceToConvert]
+            if not self.str_outputFileStem.startswith('%'):
+                self.str_outputFileStem, ext = os.path.splitext(self.l_dcmFileNames[self._sliceToConvert])
         if not self._b_convertMiddleSlice and self._sliceToConvert != -1:
             self._dcm = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert],force=True)
-            self._str_inputFile = self.l_dcmFileNames[self._sliceToConvert]
+            self.str_inputFile = self.l_dcmFileNames[self._sliceToConvert]
         else:
-            self._dcm = dicom.read_file(self._str_inputFile,force=True)
+            self._dcm = dicom.read_file(self.str_inputFile,force=True)
         if self._sliceToConvert == -1:
             self._b_3D = True
-            self._dcm = dicom.read_file(self._str_inputFile,force=True)
+            self._dcm = dicom.read_file(self.str_inputFile,force=True)
             image = self._dcm.pixel_array
             shape2D = image.shape
             #print(shape2D)
@@ -485,27 +492,30 @@ class med2image_dcm(med2image):
                 self._dcm = dicom.read_file(img,force=True)
                 image = self._dcm.pixel_array
                 self._dcmList.append(self._dcm)
-                #print('%s: %s\n' % (img, image.shape))
+                #print('%s: %s' % (img, image.shape))
                 try:
                     self._Vnp_3DVol[:,:,i] = image
                 except Exception as e:
-                    error.fatal(self, 'dcmInsertionFail', '\nFor input DICOM file %s\n%s\n' % (img, str(e)))
+                    self.warn( 
+                    'dcmInsertionFail', 
+                    '\nFor input DICOM file %s%s' % (img, str(e)),
+                    True)
                 i += 1
-        if self._str_outputFileStem.startswith('%'):
-            str_spec = self._str_outputFileStem
-            self._str_outputFileStem = ''
+        if self.str_outputFileStem.startswith('%'):
+            str_spec = self.str_outputFileStem
+            self.str_outputFileStem = ''
             for key in str_spec.split('%')[1:]:
                 str_fileComponent = ''
                 if key == 'inputFile':
-                    str_fileName, str_ext = os.path.splitext(self._str_inputFile) 
+                    str_fileName, str_ext = os.path.splitext(self.str_inputFile) 
                     str_fileComponent = str_fileName
                 else:
                     str_fileComponent = eval('self._dcm.%s' % key)
                     str_fileComponent = med2image.urlify(str_fileComponent)
-                if not len(self._str_outputFileStem):
-                    self._str_outputFileStem = str_fileComponent
+                if not len(self.str_outputFileStem):
+                    self.str_outputFileStem = str_fileComponent
                 else:
-                    self._str_outputFileStem = self._str_outputFileStem + '-' + str_fileComponent
+                    self.str_outputFileStem = self.str_outputFileStem + '-' + str_fileComponent
         image = self._dcm.pixel_array
         self._Mnp_2Dslice = image
 
@@ -525,13 +535,13 @@ class med2image_dcm(med2image):
             value = med2image_dcm.sanitize(dcm.data_element(field).value)
         return value
 
-    def warn(self, str_tag):
+    def warn(self, str_tag, str_extraMsg = '', b_exit = False):
         '''
         Print a warning using the passed <str_tag>
         '''
-        str_actrion     = med2image._dictErr[str_tag]['action']
+        str_action      = med2image._dictErr[str_tag]['action']
         str_error       = med2image._dictErr[str_tag]['error']
-
+        exitCode        = med2image._dictErr[str_tag]['exitCode']
         self.dp.qprint(
             'Some error seems to have occured!', comms = 'error'
         )
@@ -541,52 +551,56 @@ class med2image_dcm(med2image):
         self.dp.qprint(
             '%s' % str_error, comms = 'error'
         )
+        if len(str_extraMsg):
+            self.dp.qprint(str_extraMsg, comms = 'error')
+        if b_exit:
+            sys.exit(exitCode)
 
     def run(self):
         '''
         Runs the DICOM conversion based on internal state.
         '''
-        self.dp.qprint('Converting DICOM image.\n')
+        self.dp.qprint('Converting DICOM image.')
         try:
-            self.dp.qprint('PatientName:                                %s\n' % self._dcm.PatientName)
+            self.dp.qprint('PatientName:                                %s' % self._dcm.PatientName)
         except AttributeError:
-            self.dp.qprint('PatientName:                                %s\n' % 'PatientName not found in DCM header.')
+            self.dp.qprint('PatientName:                                %s' % 'PatientName not found in DCM header.')
             self.warn( 'PatientNameTag')
         try:
-            self.dp.qprint('PatientAge:                                 %s\n' % self._dcm.PatientAge)
+            self.dp.qprint('PatientAge:                                 %s' % self._dcm.PatientAge)
         except AttributeError:
-            self.dp.qprint('PatientAge:                                 %s\n' % 'PatientAge not found in DCM header.')
+            self.dp.qprint('PatientAge:                                 %s' % 'PatientAge not found in DCM header.')
             self.warn( 'PatientAgeTag')
         try:
-            self.dp.qprint('PatientSex:                                 %s\n' % self._dcm.PatientSex)
+            self.dp.qprint('PatientSex:                                 %s' % self._dcm.PatientSex)
         except AttributeError:
-            self.dp.qprint('PatientSex:                                 %s\n' % 'PatientSex not found in DCM header.')
+            self.dp.qprint('PatientSex:                                 %s' % 'PatientSex not found in DCM header.')
             self.warn( 'PatientSexTag')
         try:
-            self.dp.qprint('PatientID:                                  %s\n' % self._dcm.PatientID)
+            self.dp.qprint('PatientID:                                  %s' % self._dcm.PatientID)
         except AttributeError:
-            self.dp.qprint('PatientID:                                  %s\n' % 'PatientID not found in DCM header.')
+            self.dp.qprint('PatientID:                                  %s' % 'PatientID not found in DCM header.')
             self.warn( 'PatientIDTag')
         try:
-            self.dp.qprint('SeriesDescription:                          %s\n' % self._dcm.SeriesDescription)
+            self.dp.qprint('SeriesDescription:                          %s' % self._dcm.SeriesDescription)
         except AttributeError:
-            self.dp.qprint('SeriesDescription:                          %s\n' % 'SeriesDescription not found in DCM header.')
+            self.dp.qprint('SeriesDescription:                          %s' % 'SeriesDescription not found in DCM header.')
             self.warn( 'SeriesDescriptionTag')
         try:
-            self.dp.qprint('ProtocolName:                               %s\n' % self._dcm.ProtocolName)
+            self.dp.qprint('ProtocolName:                               %s' % self._dcm.ProtocolName)
         except AttributeError:
-            self.dp.qprint('ProtocolName:                               %s\n' % 'ProtocolName not found in DCM header.')
+            self.dp.qprint('ProtocolName:                               %s' % 'ProtocolName not found in DCM header.')
             self.warn( 'ProtocolNameTag')
 
         if self._b_convertMiddleSlice:
-            self.dp.qprint('Converting middle slice in DICOM series:    %d\n' % self._sliceToConvert)
+            self.dp.qprint('Converting middle slice in DICOM series:    %d' % self._sliceToConvert)
 
         l_rot90 = [ True, True, False ]
-        med2image.mkdir(self._str_outputDir)
+        med2image.mkdir(self.str_outputDir)
         if not self._b_3D:
-            str_outputFile = '%s/%s.%s' % (self._str_outputDir,
-                                        self._str_outputFileStem,
-                                        self._str_outputFileType)
+            str_outputFile = '%s/%s.%s' % (self.str_outputDir,
+                                        self.str_outputFileStem,
+                                        self.str_outputFileType)
             self.process_slice()
             self.slice_save(str_outputFile)
         if self._b_3D:
@@ -604,9 +618,15 @@ class med2image_nii(med2image):
     Sub class that handles NIfTI data.
     '''
 
+    def tic(self):
+        return super().tic()
+
+    def toc(self):
+        return super().toc()
+
     def __init__(self, **kwargs):
         med2image.__init__(self, **kwargs)
-        nimg = nib.load(self._str_inputFile)
+        nimg = nib.load(self.str_inputFile)
         data = nimg.get_data()
         if data.ndim == 4:
             self._Vnp_4DVol     = data
@@ -621,7 +641,7 @@ class med2image_nii(med2image):
         '''
 
         self.dp.qprint('About to perform NifTI to %s conversion...\n' %
-                  self._str_outputFileType)
+                  self.str_outputFileType)
 
         frames     = 1
         frameStart = 0
@@ -658,12 +678,62 @@ class med2image_nii(med2image):
                 sliceStart  = self._sliceToConvert
                 sliceEnd    = self._sliceToConvert + 1
 
-            med2image.mkdir(self._str_outputDir)
+            med2image.mkdir(self.str_outputDir)
             if self._b_reslice:
                 for dim in ['x', 'y', 'z']:
                     self.dim_save(dimension = dim, makeSubDir = True, indexStart = sliceStart, indexStop = sliceEnd, rot90 = True, frame = f)
             else:
                 self.dim_save(dimension = 'z', makeSubDir = False, indexStart = sliceStart, indexStop = sliceEnd, rot90 = True, frame = f)
 
+class object_factoryCreate:
+    """
+    A class that examines input file string for extension information and
+    returns the relevant convert object.
+    """
 
+    def __init__(self, args):
+        """
+        Parse relevant CLI args.
+        """
+        str_outputFileStem, str_outputFileExtension = os.path.splitext(args.outputFileStem)
+        if len(str_outputFileExtension):
+            str_outputFileExtension = str_outputFileExtension.split('.')[1]
+        try:
+            str_inputFileStem, str_inputFileExtension = os.path.splitext(args.inputFile)
+        except:
+            sys.exit(1)
 
+        if not len(args.outputFileType) and len(str_outputFileExtension):
+            args.outputFileType = str_outputFileExtension
+
+        if len(str_outputFileExtension):
+            args.outputFileStem = str_outputFileStem
+
+        b_niftiExt = (str_inputFileExtension == '.nii' or
+                    str_inputFileExtension == '.gz')
+        b_dicomExt = str_inputFileExtension == '.dcm'
+        if b_niftiExt:
+            self.C_convert = med2image_nii(
+                inputFile       = args.inputFile,
+                inputDir        = args.inputDir,
+                outputDir       = args.outputDir,
+                outputFileStem  = args.outputFileStem,
+                outputFileType  = args.outputFileType,
+                sliceToConvert  = args.sliceToConvert,
+                frameToConvert  = args.frameToConvert,
+                showSlices      = args.showSlices,
+                reslice         = args.reslice
+            )
+
+            print('sliceToConvert:', args.sliceToConvert)
+
+        if b_dicomExt:
+            self.C_convert = med2image_dcm(
+                inputFile       = args.inputFile,
+                inputDir        = args.inputDir,
+                outputDir       = args.outputDir,
+                outputFileStem  = args.outputFileStem,
+                outputFileType  = args.outputFileType,
+                sliceToConvert  = args.sliceToConvert,
+                reslice         = args.reslice
+            )
