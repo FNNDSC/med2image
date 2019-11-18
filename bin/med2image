@@ -1,89 +1,54 @@
 #!/usr/bin/env python3
 #
-# NAME
 #
-#        med2image
+# (c) 2017-2019 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                     Boston Children's Hospital
 #
-# DESCRIPTION
-#
-#        'med2image' converts from medical image data files to
-#        display-friendly formats (like png and jpg).
-#
-# HISTORY
-#
-# 23 February 2015
-# o Initial design and coding.
+#              http://childrenshospital.org/FNNDSC/
+#                        dev@babyMRI.org
 #
 
 # System imports
-import os
-import sys
+import  os
+import  sys
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), '..'))
-import argparse
-from med2image import med2image
+import  argparse
 
-str_version = "1.1.1"
+from    med2image           import med2image
+from    argparse            import RawTextHelpFormatter
+from    argparse            import ArgumentParser
+from    pfmisc._colors      import Colors
+
+
+
+str_version = "2.0.1"
 #import pdb; pdb.set_trace()
 
-#define script arguments
-parser = argparse.ArgumentParser(
-    description="med2view converts an input medical image file to a more conventional graphical format.")
-parser.add_argument("-i", "--inputFile",
-                    help="input file",
-                    dest='inputFile')
-parser.add_argument("-o", "--outputFileStem",
-                    help="output file",
-                    default="output.jpg",
-                    dest='outputFileStem')
-parser.add_argument("-d", "--outputDir",
-                    help="output image directory",
-                    dest='outputDir',
-                    default='.')
-parser.add_argument("-t", "--outputFileType",
-                    help="output image type",
-                    dest='outputFileType',
-                    default='')
-parser.add_argument("-s", "--sliceToConvert",
-                    help="slice to convert (for 3D data)",
-                    dest='sliceToConvert',
-                    default='-1')
-parser.add_argument("-f", "--frameToConvert",
-                    help="frame to convert (for 4D data)",
-                    dest='frameToConvert',
-                    default='-1')
-parser.add_argument("--printElapsedTime",
-                    help="print program run time",
-                    dest='printElapsedTime',
-                    action='store_true',
-                    default=False)
-parser.add_argument('-r', '--reslice',
-                    help="save images along i,j,k directions -- 3D input only",
-                    dest='reslice',
-                    action='store_true',
-                    default=False)
-parser.add_argument('--showSlices',
-                    help="show slices that are converted",
-                    dest='showSlices',
-                    action='store_true',
-                    default=False)
-parser.add_argument('--func',
-                    help="apply transformation function before saving",
-                    dest='func')
-parser.add_argument("-x", "--man",
-                    help="man",
-                    dest='man',
-                    action='store_true',
-                    default=False)
-parser.add_argument("-y", "--synopsis",
-                    help="short synopsis",
-                    dest='synopsis',
-                    action='store_true',
-                    default=False)
-parser.add_argument('-v', '--version',
-                    help    = 'if specified, print version number',
-                    dest    = 'b_version',
-                    action  = 'store_true',
-                    default = False)
+str_desc    = Colors.CYAN + """
+
+                        _  _____  _                            
+                       | |/ __  \(_)                           
+     _ __ ___   ___  __| |`' / /' _ _ __ ___   __ _  __ _  ___ 
+    | '_ ` _ \ / _ \/ _` |  / /  | | '_ ` _ \ / _` |/ _` |/ _ \\
+    | | | | | |  __/ (_| |./ /___| | | | | | | (_| | (_| |  __/
+    |_| |_| |_|\___|\__,_|\_____/|_|_| |_| |_|\__,_|\__, |\___|
+                                                 __/ |     
+                                                |___/      
+
+
+                        med(ical image)2image
+
+            Converts typical medical image formats to jpg/png
+
+                    -- version """ + \
+           Colors.YELLOW + str_version + Colors.CYAN + """ --
+
+    'med2image' converts image files from standard medical formats
+    such as DICOM and NIfTI to more web-friendly formats such as
+    png and jpg.
+
+""" + Colors.NO_COLOUR
+
 
 def synopsis(ab_shortOnly=False):
     scriptName = os.path.basename(sys.argv[0])
@@ -94,18 +59,18 @@ def synopsis(ab_shortOnly=False):
 
     SYNOPSIS
 
-            %s                                   \\
-                     -i|--input <inputFile>                \\
-                    [-d|--outputDir <outputDir>]           \\
-                     -o|--output <outputFileStem>          \\
-                    [-t|--outputFileType <outputFileType>] \\
-                    [-s|--sliceToConvert <sliceToConvert>] \\
-                    [-f|--frameToConvert <frameToConvert>] \\
-                    [--showSlices]                         \\
-                    [--func {invertIntensities}]            \\
-                    [--reslice]                            \\
-                    [-x|--man]				   \\
-		    [-y|--synopsis]
+            %s                                       \\
+                     -i|--input <inputFile>                 \\
+                    [-d|--outputDir <outputDir>]            \\
+                     -o|--output <outputFileStem>           \\
+                    [-t|--outputFileType <outputFileType>]  \\
+                    [-s|--sliceToConvert <sliceToConvert>]  \\
+                    [-f|--frameToConvert <frameToConvert>]  \\
+                    [--showSlices]                          \\
+                    [--func <functionName>]                 \\
+                    [--reslice]                             \\
+                    [-x|--man]                              \\
+                    [-y|--synopsis]
 
     BRIEF EXAMPLE
 
@@ -174,8 +139,12 @@ def synopsis(ab_shortOnly=False):
         [--showSlices]
         If specified, render/show image slices as they are created.
         
-        [--func {invertIntensities}]
-        Apply the specified transformation function before saving.
+        [--func <functionName>]
+        Apply the specified transformation function before saving. Currently 
+        support functions:
+
+            * invertIntensities
+              Inverts the contrast intensity of the source image.
 
         [--reslice]
         For 3D data only. Assuming [i,j,k] coordinates, the default is to save
@@ -231,6 +200,68 @@ def synopsis(ab_shortOnly=False):
         return shortSynopsis + description
 
 
+#define script arguments
+
+parser  = ArgumentParser(description = str_desc, formatter_class = RawTextHelpFormatter)
+
+parser.add_argument("-i", "--inputFile",
+                    help="input file",
+                    dest='inputFile')
+parser.add_argument("-o", "--outputFileStem",
+                    help="output file",
+                    default="output.jpg",
+                    dest='outputFileStem')
+parser.add_argument("-d", "--outputDir",
+                    help="output image directory",
+                    dest='outputDir',
+                    default='.')
+parser.add_argument("-t", "--outputFileType",
+                    help="output image type",
+                    dest='outputFileType',
+                    default='')
+parser.add_argument("-s", "--sliceToConvert",
+                    help="slice to convert (for 3D data)",
+                    dest='sliceToConvert',
+                    default='-1')
+parser.add_argument("-f", "--frameToConvert",
+                    help="frame to convert (for 4D data)",
+                    dest='frameToConvert',
+                    default='-1')
+parser.add_argument("--printElapsedTime",
+                    help="print program run time",
+                    dest='printElapsedTime',
+                    action='store_true',
+                    default=False)
+parser.add_argument('-r', '--reslice',
+                    help="save images along i,j,k directions -- 3D input only",
+                    dest='reslice',
+                    action='store_true',
+                    default=False)
+parser.add_argument('--showSlices',
+                    help="show slices that are converted",
+                    dest='showSlices',
+                    action='store_true',
+                    default=False)
+parser.add_argument('--func',
+                    help="apply transformation function before saving",
+                    dest='func')
+parser.add_argument("-x", "--man",
+                    help="man",
+                    dest='man',
+                    action='store_true',
+                    default=False)
+parser.add_argument("-y", "--synopsis",
+                    help="short synopsis",
+                    dest='synopsis',
+                    action='store_true',
+                    default=False)
+parser.add_argument('-v', '--version',
+                    help    = 'if specified, print version number',
+                    dest    = 'b_version',
+                    action  = 'store_true',
+                    default = False)
+
+
 # parse passed arguments
 args = parser.parse_args()
 
@@ -239,6 +270,7 @@ if args.b_version:
     sys.exit(1)
 
 if args.man or args.synopsis:
+    print(str_desc)
     if args.man:
         str_help = synopsis(False)
     else:
@@ -292,8 +324,8 @@ if args.func:
     C_convert.func = args.func
 
 # And now run it!
-med2image.misc.tic()
+C_convert.tic()
 C_convert.run()
-if args.printElapsedTime: print("Elapsed time = %f seconds" % med2image.misc.toc())
+if args.printElapsedTime: print("Elapsed time = %f seconds" % C_convert.toc())
 sys.exit(0)
 
