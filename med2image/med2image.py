@@ -1,35 +1,88 @@
-# NAME
-#
-#        med2image
-#
-# DESCRIPTION
-#
-#        'med2image' converts from medical image data files to
-#        display-friendly formats (like png and jpg).
-#
-# HISTORY
-#
-# 23 February 2015
-# o Initial design and coding.
-#
+#!/usr/bin/env python3
 
 # System imports
 import os
 import glob
 import numpy as np
 import re
+import time
 
 # System dependency imports
-import nibabel as nib
-import dicom
+import nibabel             as  nib
+import pydicom             as  dicom
 import pylab
-import matplotlib.cm as cm
+import matplotlib.cm       as  cm
 
-# Project specific imports
-from . import error
-from . import message as msg
-from . import systemMisc as misc
+# # Project specific imports
+# from . import error
+# from . import message as msg
+# from . import systemMisc as misc
 
+import  pfmisc
+
+# pfurl local dependencies
+from    pfmisc._colors      import  Colors
+from    pfmisc.message      import  Message
+
+
+def report(     callingClass,
+                astr_key,
+                ab_exitToOs=1,
+                astr_header=""
+                ):
+    '''
+    Error handling.
+    Based on the <astr_key>, error information is extracted from
+    _dictErr and sent to log object.
+    If <ab_exitToOs> is False, error is considered non-fatal and
+    processing can continue, otherwise processing terminates.
+    '''
+    log         = callingClass.log()
+    b_syslog    = log.syslog()
+    log.syslog(False)
+    if ab_exitToOs: log( Colors.RED +    "\n:: FATAL ERROR :: " + Colors.NO_COLOUR )
+    else:           log( Colors.YELLOW + "\n::   WARNING   :: " + Colors.NO_COLOUR )
+    if len(astr_header): log( Colors.BROWN + astr_header + Colors.NO_COLOUR )
+    log( "\n" )
+    log( "\tSorry, some error seems to have occurred in:\n\t<" )
+    log( Colors.LIGHT_GREEN + ("%s" % callingClass.name()) + Colors.NO_COLOUR + "::")
+    log( Colors.LIGHT_CYAN + ("%s" % inspect.stack()[2][4][0].strip()) + Colors.NO_COLOUR)
+    log( "> called by <")
+    try:
+        caller = inspect.stack()[3][4][0].strip()
+    except:
+        caller = '__main__'
+    log( Colors.LIGHT_GREEN + ("%s" % callingClass.name()) + Colors.NO_COLOUR + "::")
+    log( Colors.LIGHT_CYAN + ("%s" % caller) + Colors.NO_COLOUR)
+    log( ">\n")
+
+    log( "\tWhile %s\n" % callingClass._dictErr[astr_key]['action'] )
+    log( "\t%s\n" % callingClass._dictErr[astr_key]['error'] )
+    log( "\n" )
+    if ab_exitToOs:
+        log( "Returning to system with error code %d\n" % \
+                        callingClass._dictErr[astr_key]['exitCode'] )
+        sys.exit( callingClass._dictErr[astr_key]['exitCode'] )
+    log.syslog(b_syslog)
+    return callingClass._dictErr[astr_key]['exitCode']
+
+
+def fatal( callingClass, astr_key, astr_extraMsg="" ):
+    '''
+    Convenience dispatcher to the error_exit() method.
+    Will raise "fatal" error, i.e. terminate script.
+    '''
+    b_exitToOS  = True
+    report( callingClass, astr_key, b_exitToOS, astr_extraMsg )
+
+
+def warn( callingClass, astr_key, astr_extraMsg="" ):
+    '''
+    Convenience dispatcher to the error_exit() method.
+    Will raise "warning" error, i.e. script processing continues.
+    '''
+    b_exitToOS = False
+    report( callingClass, astr_key, b_exitToOS, astr_extraMsg )
 
 class med2image(object):
     """
@@ -77,6 +130,26 @@ class med2image(object):
             'error': 'the DICOM file does not seem to contain a SeriesDescription tag.',
             'exitCode': 30}
     }
+
+    @staticmethod
+    def mkdir(newdir, mode=0x775):
+        """
+        works the way a good mkdir should :)
+            - already exists, silently complete
+            - regular file in the way, raise an exception
+            - parent directory(ies) does not exist, make them as well
+        """
+        if os.path.isdir(newdir):
+            pass
+        elif os.path.isfile(newdir):
+            raise OSError("a file with the same name as the desired " \
+                        "dir, '%s', already exists." % newdir)
+        else:
+            head, tail = os.path.split(newdir)
+            if head and not os.path.isdir(head):
+                os.mkdir(head)
+            if tail:
+                os.mkdir(newdir)
         
     def log(self, *args):
         '''
@@ -108,8 +181,6 @@ class med2image(object):
         else:
             return self._str_desc
 
-    def log(self): return self._log
-
     @staticmethod
     def urlify(astr, astr_join = '_'):
         # Remove all non-word characters (everything except numbers and letters)
@@ -126,9 +197,9 @@ class med2image(object):
         # Object desc block
         #
         self._str_desc                  = ''
-        self._log                       = msg.Message()
-        self._log._b_syslog             = True
-        self.__name                     = "med2image"
+        # self._log                       = msg.Message()
+        # self._log._b_syslog             = True
+        self.__name__                   = "med2image"
 
         # Directory and filenames
         self._str_workingDir            = ''
@@ -159,9 +230,17 @@ class med2image(object):
         self._dcm                       = None
         self._dcmList                   = []
 
+        self.verbosity                  = 1
+
         # A logger
-        self._log                       = msg.Message()
-        self._log.syslog(True)
+        # self._log                       = msg.Message()
+        # self._log.syslog(True)
+
+        self.dp                         = pfmisc.debug(    
+                                            verbosity   = self.verbosity,
+                                            within      = self.__name__ 
+                                            )
+
 
         # Flags
         self._b_showSlices              = False
@@ -201,6 +280,29 @@ class med2image(object):
 
         if not len(self._str_outputFileType) and not len(str_fileExtension):
             self._str_outputFileType     = '.png'
+
+    def tic(self):
+        """
+            Port of the MatLAB function of same name
+        """
+        global Gtic_start
+        Gtic_start = time.time()
+
+    def toc(self, *args, **kwargs):
+        """
+            Port of the MatLAB function of same name
+
+            Behaviour is controllable to some extent by the keyword
+            args:
+
+
+        """
+        global Gtic_start
+        f_elapsedTime = time.time() - Gtic_start
+        for key, value in kwargs.iteritems():
+            if key == 'sysprint':   return value % f_elapsedTime
+            if key == 'default':    return "Elapsed time = %f seconds." % f_elapsedTime
+        return f_elapsedTime
 
     def run(self):
         '''
@@ -269,7 +371,7 @@ class med2image(object):
 
     def dim_save(self, **kwargs):
         dims            = self._Vnp_3DVol.shape
-        self._log('Image volume logical (i, j, k) size: %s\n' % str(dims))
+        self.dp.qprint('Image volume logical (i, j, k) size: %s\n' % str(dims))
         str_dim         = 'z'
         b_makeSubDir    = False
         b_rot90         = False
@@ -287,7 +389,7 @@ class med2image(object):
         str_subDir  = ''
         if b_makeSubDir: 
             str_subDir = str_dim
-            misc.mkdir('%s/%s' % (self._str_outputDir, str_subDir))
+            med2image.mkdir('%s/%s' % (self._str_outputDir, str_subDir))
 
         dim_ix = {'x':0, 'y':1, 'z':2}
         if indexStart == 0 and indexStop == -1:
@@ -324,7 +426,7 @@ class med2image(object):
         o astr_output
         The output filename to save the slice to.
         '''
-        self._log('Outputfile = %s\n' % astr_outputFile)
+        self.dp.qprint('Outputfile = %s\n' % astr_outputFile)
         fformat = astr_outputFile.split('.')[-1]
         if fformat == 'dcm':
             if self._dcm:
@@ -344,6 +446,13 @@ class med2image(object):
 
 
 class med2image_dcm(med2image):
+
+    def tic(self):
+        super()
+
+    def toc(self):
+        super()
+
     '''
     Sub class that handles DICOM data.
     '''
@@ -400,6 +509,7 @@ class med2image_dcm(med2image):
         image = self._dcm.pixel_array
         self._Mnp_2Dslice = image
 
+    @staticmethod
     def sanitize(value):
         # convert to string and remove trailing spaces
         tvalue = str(value).strip()
@@ -412,50 +522,67 @@ class med2image_dcm(med2image):
     def processDicomField(self, dcm, field):
         value = "no value provided"
         if field in dcm:
-            value = self.sanitize(dcm.data_element(field).value)
+            value = med2image_dcm.sanitize(dcm.data_element(field).value)
         return value
+
+    def warn(self, str_tag):
+        '''
+        Print a warning using the passed <str_tag>
+        '''
+        str_actrion     = med2image._dictErr[str_tag]['action']
+        str_error       = med2image._dictErr[str_tag]['error']
+
+        self.dp.qprint(
+            'Some error seems to have occured!', comms = 'error'
+        )
+        self.dp.qprint(
+            'While %s' % str_action, comms = 'error'
+        )
+        self.dp.qprint(
+            '%s' % str_error, comms = 'error'
+        )
 
     def run(self):
         '''
         Runs the DICOM conversion based on internal state.
         '''
-        self._log('Converting DICOM image.\n')
+        self.dp.qprint('Converting DICOM image.\n')
         try:
-            self._log('PatientName:                                %s\n' % self._dcm.PatientName)
+            self.dp.qprint('PatientName:                                %s\n' % self._dcm.PatientName)
         except AttributeError:
-            self._log('PatientName:                                %s\n' % 'PatientName not found in DCM header.')
-            error.warn(self, 'PatientNameTag')
+            self.dp.qprint('PatientName:                                %s\n' % 'PatientName not found in DCM header.')
+            self.warn( 'PatientNameTag')
         try:
-            self._log('PatientAge:                                 %s\n' % self._dcm.PatientAge)
+            self.dp.qprint('PatientAge:                                 %s\n' % self._dcm.PatientAge)
         except AttributeError:
-            self._log('PatientAge:                                 %s\n' % 'PatientAge not found in DCM header.')
-            error.warn(self, 'PatientAgeTag')
+            self.dp.qprint('PatientAge:                                 %s\n' % 'PatientAge not found in DCM header.')
+            self.warn( 'PatientAgeTag')
         try:
-            self._log('PatientSex:                                 %s\n' % self._dcm.PatientSex)
+            self.dp.qprint('PatientSex:                                 %s\n' % self._dcm.PatientSex)
         except AttributeError:
-            self._log('PatientSex:                                 %s\n' % 'PatientSex not found in DCM header.')
-            error.warn(self, 'PatientSexTag')
+            self.dp.qprint('PatientSex:                                 %s\n' % 'PatientSex not found in DCM header.')
+            self.warn( 'PatientSexTag')
         try:
-            self._log('PatientID:                                  %s\n' % self._dcm.PatientID)
+            self.dp.qprint('PatientID:                                  %s\n' % self._dcm.PatientID)
         except AttributeError:
-            self._log('PatientID:                                  %s\n' % 'PatientID not found in DCM header.')
-            error.warn(self, 'PatientIDTag')
+            self.dp.qprint('PatientID:                                  %s\n' % 'PatientID not found in DCM header.')
+            self.warn( 'PatientIDTag')
         try:
-            self._log('SeriesDescription:                          %s\n' % self._dcm.SeriesDescription)
+            self.dp.qprint('SeriesDescription:                          %s\n' % self._dcm.SeriesDescription)
         except AttributeError:
-            self._log('SeriesDescription:                          %s\n' % 'SeriesDescription not found in DCM header.')
-            error.warn(self, 'SeriesDescriptionTag')
+            self.dp.qprint('SeriesDescription:                          %s\n' % 'SeriesDescription not found in DCM header.')
+            self.warn( 'SeriesDescriptionTag')
         try:
-            self._log('ProtocolName:                               %s\n' % self._dcm.ProtocolName)
+            self.dp.qprint('ProtocolName:                               %s\n' % self._dcm.ProtocolName)
         except AttributeError:
-            self._log('ProtocolName:                               %s\n' % 'ProtocolName not found in DCM header.')
-            error.warn(self, 'ProtocolNameTag')
+            self.dp.qprint('ProtocolName:                               %s\n' % 'ProtocolName not found in DCM header.')
+            self.warn( 'ProtocolNameTag')
 
         if self._b_convertMiddleSlice:
-            self._log('Converting middle slice in DICOM series:    %d\n' % self._sliceToConvert)
+            self.dp.qprint('Converting middle slice in DICOM series:    %d\n' % self._sliceToConvert)
 
         l_rot90 = [ True, True, False ]
-        misc.mkdir(self._str_outputDir)
+        med2image.mkdir(self._str_outputDir)
         if not self._b_3D:
             str_outputFile = '%s/%s.%s' % (self._str_outputDir,
                                         self._str_outputFileStem,
@@ -493,7 +620,7 @@ class med2image_nii(med2image):
         Runs the NIfTI conversion based on internal state.
         '''
 
-        self._log('About to perform NifTI to %s conversion...\n' %
+        self.dp.qprint('About to perform NifTI to %s conversion...\n' %
                   self._str_outputFileType)
 
         frames     = 1
@@ -504,10 +631,10 @@ class med2image_nii(med2image):
         sliceEnd   = 0
 
         if self._b_4D:
-            self._log('4D volume detected.\n')
+            self.dp.qprint('4D volume detected.\n')
             frames = self._Vnp_4DVol.shape[3]
         if self._b_3D:
-            self._log('3D volume detected.\n')
+            self.dp.qprint('3D volume detected.\n')
 
         if self._b_convertMiddleFrame:
             self._frameToConvert = int(frames/2)
@@ -531,7 +658,7 @@ class med2image_nii(med2image):
                 sliceStart  = self._sliceToConvert
                 sliceEnd    = self._sliceToConvert + 1
 
-            misc.mkdir(self._str_outputDir)
+            med2image.mkdir(self._str_outputDir)
             if self._b_reslice:
                 for dim in ['x', 'y', 'z']:
                     self.dim_save(dimension = dim, makeSubDir = True, indexStart = sliceStart, indexStop = sliceEnd, rot90 = True, frame = f)
