@@ -7,7 +7,7 @@ import  glob
 import  numpy as np
 import  re
 import  time
-import  pudb
+# import  pudb
 
 # System dependency imports
 import nibabel             as  nib
@@ -152,7 +152,7 @@ class med2image(object):
                 os.mkdir(head)
             if tail:
                 os.mkdir(newdir)
-        
+
     def log(self, *args):
         '''
         get/set the internal pipeline log message object.
@@ -187,10 +187,10 @@ class med2image(object):
     def urlify(astr, astr_join = '_'):
         # Remove all non-word characters (everything except numbers and letters)
         astr = re.sub(r"[^\w\s]", '', astr)
-        
+
         # Replace all runs of whitespace with an underscore
         astr = re.sub(r"\s+", astr_join, astr)
-        
+
         return astr
 
     def __init__(self, **kwargs):
@@ -238,9 +238,9 @@ class med2image(object):
         # self._log                       = msg.Message()
         # self._log.syslog(True)
 
-        self.dp                         = pfmisc.debug(    
+        self.dp                         = pfmisc.debug(
                                             verbosity   = self.verbosity,
-                                            within      = self.__name__ 
+                                            within      = self.__name__
                                             )
 
 
@@ -275,7 +275,7 @@ class med2image(object):
 
         if len(self.str_inputDir):
             self.str_inputFile  = '%s/%s' % (self.str_inputDir, self.str_inputFile)
-        if not len(self.str_inputDir): 
+        if not len(self.str_inputDir):
             self.str_inputDir = os.path.dirname(self.str_inputFile)
         if not len(self.str_inputDir): self.str_inputDir = '.'
         str_fileName, str_fileExtension  = os.path.splitext(self.str_outputFileStem)
@@ -356,10 +356,10 @@ class med2image(object):
         frame   = 0
         str_subDir  = ""
         for key,val in kwargs.items():
-            if key == 'index':  index       = val 
+            if key == 'index':  index       = val
             if key == 'frame':  frame       = val
             if key == 'subDir': str_subDir  = val
-        
+
         if self._b_4D:
             str_outputFile = '%s/%s/%s-frame%03d-slice%03d.%s' % (
                                                     self.str_outputDir,
@@ -388,13 +388,13 @@ class med2image(object):
         for key, val in kwargs.items():
             if key == 'dimension':  str_dim         = val
             if key == 'makeSubDir': b_makeSubDir    = val
-            if key == 'indexStart': indexStart      = val 
+            if key == 'indexStart': indexStart      = val
             if key == 'indexStop':  indexStop       = val
             if key == 'rot90':      b_rot90         = val
             if key == 'frame':      frame           = val
 
         str_subDir  = ''
-        if b_makeSubDir: 
+        if b_makeSubDir:
             str_subDir = str_dim
             med2image.mkdir('%s/%s' % (self.str_outputDir, str_subDir))
 
@@ -473,8 +473,11 @@ class med2image_dcm(med2image):
             self._sliceToConvert = int(self.slices/2)
             self._dcm            = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert],force=True)
             self.str_inputFile  = self.l_dcmFileNames[self._sliceToConvert]
-            if not self.str_outputFileStem.startswith('%'):
-                self.str_outputFileStem, ext = os.path.splitext(self.l_dcmFileNames[self._sliceToConvert])
+
+            # probably needs code for self.str_outputFileStem for _b_convertMiddleSlice = True
+
+            # if not self.str_outputFileStem.startswith('%'):
+            #     self.str_outputFileStem, ext = os.path.splitext(self.l_dcmFileNames[self._sliceToConvert])
         if not self._b_convertMiddleSlice and self._sliceToConvert != -1:
             self._dcm = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert],force=True)
             self.str_inputFile = self.l_dcmFileNames[self._sliceToConvert]
@@ -496,8 +499,8 @@ class med2image_dcm(med2image):
                 try:
                     self._Vnp_3DVol[:,:,i] = image
                 except Exception as e:
-                    self.warn( 
-                    'dcmInsertionFail', 
+                    self.warn(
+                    'dcmInsertionFail',
                     '\nFor input DICOM file %s%s' % (img, str(e)),
                     True)
                 i += 1
@@ -507,7 +510,7 @@ class med2image_dcm(med2image):
             for key in str_spec.split('%')[1:]:
                 str_fileComponent = ''
                 if key == 'inputFile':
-                    str_fileName, str_ext = os.path.splitext(self.str_inputFile) 
+                    str_fileName, str_ext = os.path.splitext(self.str_inputFile)
                     str_fileComponent = str_fileName
                 else:
                     str_fileComponent = eval('self._dcm.%s' % key)
@@ -612,7 +615,7 @@ class med2image_dcm(med2image):
             else:
                 self.dim_save(dimension = 'z', makeSubDir = False, rot90 = False, indexStart = 0, indexStop = -1)
 
-                
+
 class med2image_nii(med2image):
     '''
     Sub class that handles NIfTI data.
@@ -684,6 +687,14 @@ class med2image_nii(med2image):
                     self.dim_save(dimension = dim, makeSubDir = True, indexStart = sliceStart, indexStop = sliceEnd, rot90 = True, frame = f)
             else:
                 self.dim_save(dimension = 'z', makeSubDir = False, indexStart = sliceStart, indexStop = sliceEnd, rot90 = True, frame = f)
+
+            # rotCount = 0
+            # if self._b_reslice:
+            #     for dim in ['x', 'y', 'z']:
+            #         self.dim_save(dimension = dim, makeSubDir = True, rot90 = l_rot90[rotCount], indexStart = 0, indexStop = -1)
+            #         rotCount += 2
+            # else:
+            #     self.dim_save(dimension = 'z', makeSubDir = False, rot90 = False, indexStart = 0, indexStop = -1)
 
 class object_factoryCreate:
     """
