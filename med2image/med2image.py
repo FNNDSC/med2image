@@ -474,8 +474,6 @@ class med2image_dcm(med2image):
             self._dcm            = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert],force=True)
             self.str_inputFile  = self.l_dcmFileNames[self._sliceToConvert]
 
-            # probably needs code for self.str_outputFileStem for _b_convertMiddleSlice = True
-
             # if not self.str_outputFileStem.startswith('%'):
             #     self.str_outputFileStem, ext = os.path.splitext(self.l_dcmFileNames[self._sliceToConvert])
         if not self._b_convertMiddleSlice and self._sliceToConvert != -1:
