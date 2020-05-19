@@ -1,5 +1,5 @@
-med2image
-=========
+med2image -- 2.1.0
+==================
 
 Quick Overview
 --------------
@@ -21,6 +21,7 @@ Dependencies
 Make sure that the following dependencies are installed on your host
 system (or even better, a python3 virtual env):
 
+-  ``pfmisc`` (a general miscellaneous module for color support, etc) 
 -  ``nibabel`` (to read NIfTI files)
 -  ``pydicom`` (to read DICOM files)
 -  ``matplotlib`` (to save data in various image formats)
