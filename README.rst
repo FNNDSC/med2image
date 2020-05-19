@@ -247,7 +247,10 @@ Alternatively a specific slice index can be converted. Use
 to convert only the 20th slice of the volume.
 
 
-**Note:** If outputDir (-d) is not mentioned, the slice will get created in the current directory.
+**Note:**
+
+- If outputDir (-d) is not mentioned, the slice will get created in the current directory.
+- if `--sliceToConvert` argument is not specified, then it converts all the `.dcm` files in the directory by default.
 
 Convert all DICOMS in a directory/series
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
