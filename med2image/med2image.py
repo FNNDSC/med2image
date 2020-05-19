@@ -7,22 +7,16 @@ import  glob
 import  numpy as np
 import  re
 import  time
-# import  pudb
+import  pudb
 
 # System dependency imports
-import nibabel             as  nib
-import pydicom             as  dicom
+import nibabel              as      nib
+import pydicom              as      dicom
 import pylab
-import matplotlib.cm       as  cm
+import matplotlib.cm        as      cm
 
-# # Project specific imports
-# from . import error
-# from . import message as msg
-# from . import systemMisc as misc
 
 import  pfmisc
-
-# pfurl local dependencies
 from    pfmisc._colors      import  Colors
 from    pfmisc.message      import  Message
 
