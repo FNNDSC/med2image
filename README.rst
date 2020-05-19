@@ -44,6 +44,24 @@ Should you get an error about `python3-tk` not installed, simply do (for example
         sudo apt-get update
         sudo apt-get install -y python3-tk
 
+How to Use
+----------
+
+The med2image needs the following required arguments to run the application:
+
+- -i|--inputFile <inputFile>
+        Input file to convert. Typically a DICOM file or a nifti volume.
+
+- -d|--outputDir <outputDir>
+        The directory to contain the converted output image files.
+
+.. code:: bash
+
+    med2image -i vol.nii -d out
+
+    OR
+
+    med2image -i file.dcm -d out
 
 Command line arguments
 ----------------------
@@ -91,11 +109,11 @@ Command line arguments
         for 2D input data. If a '-1' is sent, then convert *all* the slices.
         If an 'm' is specified, only convert the middle slice in an input
         volume.
-        
+
         [-f|--frameToConvert <sliceToConvert>]
         In the case of 4D volume files, the volume (V) containing the
-        slice (z) index to convert. Ignored for 3D input data. If a '-1' is 
-        sent, then convert *all* the frames. If an 'm' is specified, only 
+        slice (z) index to convert. Ignored for 3D input data. If a '-1' is
+        sent, then convert *all* the frames. If an 'm' is specified, only
         convert the middle frame in the 4D input stack.
 
         [--showSlices]
@@ -113,19 +131,38 @@ Command line arguments
         [-y|--synopsis]
         Show brief help.
 
-NIfTI conversion
-----------------
+NIfTI
+-----
+**NOTE:** One NIfTI (`.nii`) is one entire volume of multiple slices.
+
+     So, one `.nii` corresponds to multiple `.png` or `.jpg` file (slices)
+
+- The NIfTI input data can be in 2 forms:
+    - 3D : Single `.nii` volume which has multiple slices
+    - 4D : A directory with multiple `.nii` files (volumes)
+
+- The application understands both types of inputs.
+
+Pull NIfTI
+~~~~~~~~~~
+
+The inputFile should be a NIfTI volume of the format ``.nii``
+
+- A sample volume can be found on Github at ``FNNDSC/SAG-anon-nii``. (https://github.com/FNNDSC/SAG-anon-nii.git)
+
+- This repository can be cloned and used as an input volume.
+
+Convert NIfTI
+~~~~~~~~~~~~~
 
 Both 3D and 4D NIfTI input data are understood. In the case of 4D NIfTI,
 a specific frame can be specified in conjunction with a specific slice
 index. In most cases, only a slice is required since most NIfTI data is
 3D. Furthermore, all slices can be converted, or just the middle one.
 
-Examples
-~~~~~~~~
 
 All slices in a volume
-~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^
 
 To convert all slices in an input NIfTI volume called vol.nii, to save
 the results in a directory called out and to use as output the file stem
@@ -161,15 +198,11 @@ This will create the following files in out
     image-slice053.jpg
 
 Convert only a single slice
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Mostly, you'll probably only want to convert the "middle" slice in a
 volume (for example to generate a representative thumbnail of the
-volume). To do this, simply specify a m to --sliceToConvert
-
-``med2image -i input.nii -o input.jpg -s m``
-
-or, again, slightly more verbosely and with an outputDirectory specifier
+volume). To do this, simply specify a m to --sliceToConvert (or -s m)
 
 ``med2image -i input.nii -d out -o vol --outputFileType jpg --sliceToConvert m``
 
@@ -179,34 +212,60 @@ Alternatively a specific slice index can be converted. Use
 
 to convert only the 20th slice of the volume.
 
-DICOM conversion
-----------------
+DICOM
+-----
+
+**NOTE:** One DICOM (`.dcm`) corresponds to one `.png` or `.jpg` file (slice)
+
+Pull DICOM
+~~~~~~~~~~
+
+The inputFile should be a DICOM file of the format ``.dcm``
+
+
+- A sample volume can be found on Github at ``FNNDSC/SAG-anon``. (https://github.com/FNNDSC/SAG-anon.git)
+
+- This repository can be cloned and used as an input volume.
+
+Convert DICOM
+~~~~~~~~~~~~~
 
 Convert a single DICOM file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To convert a single DICOM file called slice.dcm to slice.jpg, do:
 
-``med2image -i slice.dcm -o slice.jpg``
+Mostly, you'll probably only want to convert the "middle" slice in a
+DICOM directory (for example to generate a representative thumbnail of the
+directory). To do this, simply specify a m to --sliceToConvert (or -s m)
 
-which will create a single file, slice.jpg in the current directory.
+``med2image -i slice.dcm -d out -o slice --outputFileType jpg --sliceToConvert m``
+
+Alternatively a specific slice index can be converted. Use
+
+``med2image -i slice.dcm -d out -o slice --outputFileType jpg --sliceToConvert 20``
+
+to convert only the 20th slice of the volume.
+
+
+**Note:** If outputDir (-d) is not mentioned, the slice will get created in the current directory.
 
 Convert all DICOMS in a directory/series
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 To convert all the DICOMS in a directory, simply specifiy a '-1' to the
 sliceIndex:
 
 ``med2image -i inputDir/slice.dcm -d outputDir -o slice.jpg -s -1``
 
-Note that this assumes all the DICOM files in the directory inputDir
+**Note:** that this assumes all the DICOM files in the directory inputDir
 belong to the same series.
+
 
 Multiple Direction Reslicing
 ----------------------------
 
 By default, only the slice (or slices) in the acquisition direction are
-converted. However, by passing a -r to the script, all dimensions are
+converted. However, by passing a `--reslice` to the script, all dimensions are
 converted. Since the script does not know the anatomical orientation of
 the image, the directions are simply labeled x, y, and z.
 
@@ -214,3 +273,5 @@ The z direction is the original acquistion (slice) direction, while x
 and y correspond to planes normal to the row and column directions.
 
 Converted images are stored in subdirectories labeled x, y, and z.
+
+**NOTE:** In case of DICOM images, the `--reslice` option will work only if all slices in the directory are converted which means: ``--sliceToConvert -1``
