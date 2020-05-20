@@ -101,7 +101,7 @@ Convert NIfTI
 - if ``--sliceToConvert`` argument is not specified, then it converts all the slices of the ``.nii`` volume by default.
 
 Both 3D and 4D NIfTI input data are understood. In the case of 4D NIfTI,
-a specific frame can be specified in conjunction with a specific slice
+a specific frame (``--frameToConvert``) can be specified in conjunction with a specific slice
 index. In most cases, only a slice is required since most NIfTI data is
 3D. Furthermore, all slices can be converted, or just the middle one.
 
