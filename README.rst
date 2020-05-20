@@ -63,7 +63,7 @@ The med2image needs the following required arguments to run the application:
 
     med2image -i file.dcm -d out
 
-** NOTE:**
+**NOTE:**
 
 - The following 2 sections: NIfTI and DICOM explain how to run the ``med2image`` app using different *Command Line Arguments*
 
