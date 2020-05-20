@@ -90,7 +90,13 @@ The inputFile should be a NIfTI volume of the format ``.nii``
 A sample volume can be found on Github at ``FNNDSC/SAG-anon-nii``. (https://github.com/FNNDSC/SAG-anon-nii.git)
 
 - Clone this repository (``SAG-anon-nii``) to your local computer.
-- This directory contains a NIfTI volume with the name ``SAG-anon.nii``.
+
+.. code:: bash
+
+    git clone https://github.com/FNNDSC/SAG-anon-nii.git
+
+- This will create a folder called ``SAG-anon-nii`` in the current working directory.
+- This directory will contain a NIfTI volume with the name ``SAG-anon.nii``.
 
 Convert NIfTI
 ~~~~~~~~~~~~~
@@ -105,39 +111,42 @@ a specific frame (``--frameToConvert``) can be specified in conjunction with a s
 index. In most cases, only a slice is required since most NIfTI data is
 3D. Furthermore, all slices can be converted, or just the middle one.
 
+- Create a folder called ``nifti-results`` in the current working directory which also contains the input data set ``SAG-anon-nii``
+
+- We will be storing all results in subdirectories within this directory.
 
 All slices in a volume
 ^^^^^^^^^^^^^^^^^^^^^^
 
 To convert all slices in the input NIfTI volume ``SAG-anon-nii/SAG-anon.nii``, to save
-the results in a directory called ``results``, to use as output the file stem
+the results in a sub-directory called ``all-slices`` within the directory ``nifti-results`` , to use as output the file stem
 name ``sample``, and to save the result in ``jpg`` format, do:
 
 .. code:: bash
 
-    med2image -i SAG-anon-nii/SAG-anon.nii -d results -o sample.jpg -s -1
+    med2image -i SAG-anon-nii/SAG-anon.nii -d nifti-results/all-slices -o sample.jpg -s -1
 
 or equivalently and more verbosely,
 
 .. code:: bash
 
-    med2image --inputFile SAG-anon-nii/SAG-anon.nii     --outputDir results      \
+    med2image --inputFile SAG-anon-nii/SAG-anon.nii     --outputDir nifti-results/all-slices      \
               --outputFileStem sample  --outputFileType jpg \
               --sliceToConvert -1
 
-This will create the following files in the ``result`` directory
+This will create the following files in the ``all-slices`` sub-directory within ``nifti-results`` directory
 
 ::
 
-    results//sample-slice000.jpg
-    results//sample-slice001.jpg
-    results//sample-slice002.jpg
-    results//sample-slice003.jpg
+    nifti-results/all-slices/sample-slice000.jpg
+    nifti-results/all-slices/sample-slice001.jpg
+    nifti-results/all-slices/sample-slice002.jpg
+    nifti-results/all-slices/sample-slice003.jpg
     ...
-    results//sample-slice188.jpg
-    results//sample-slice189.jpg
-    results//sample-slice190.jpg
-    results//sample-slice191.jpg
+    nifti-results/all-slices/sample-slice188.jpg
+    nifti-results/all-slices/sample-slice189.jpg
+    nifti-results/all-slices/sample-slice190.jpg
+    nifti-results/all-slices/sample-slice191.jpg
 
 Convert only a single slice
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -148,27 +157,27 @@ volume). To do this, simply specify a m to --sliceToConvert (or -s m)
 
 .. code:: bash
 
-    med2image -i SAG-anon-nii/SAG-anon.nii -d results -o sample --outputFileType jpg --sliceToConvert m
+    med2image -i SAG-anon-nii/SAG-anon.nii -d nifti-results/middle-slice -o sample --outputFileType jpg --sliceToConvert m
 
-This will create the following files in the ``result`` directory
+This will create the following files in the ``middle-slice`` sub-directory within ``nifti-results`` directory.
 
 ::
 
-    results//sample-slice096.jpg
+    nifti-results/middle-slice/sample-slice096.jpg
 
 Alternatively a specific slice index can be converted. Use
 
 .. code:: bash
 
-    med2image -i SAG-anon-nii/SAG-anon.nii -d results -o sample --outputFileType jpg --sliceToConvert 20
+    med2image -i SAG-anon-nii/SAG-anon.nii -d nifti-results/specific-slice -o sample --outputFileType jpg --sliceToConvert 20
 
 to convert only the 20th slice of the volume.
 
-This will create the following files in the ``result`` directory
+This will create the following files in the ``specific-slice`` sub-directory within ``nifti-results`` directory.
 
 ::
 
-    results//sample-slice020.jpg
+    nifti-results/specific-slice/sample-slice020.jpg
 
 **NOTE:**
 
@@ -199,6 +208,12 @@ Convert DICOM
 - If ``--outputDir (-d)`` is not mentioned, the slice will get created in the current directory.
 - if ``--sliceToConvert`` argument is not specified, then it converts all the `.dcm` files in the directory by default.
 
+**NOTE:**
+
+- Create a folder called ``dicom-results`` in the current working directory which also contains the input data set ``SAG-anon-nii``
+
+- We will be storing all results in subdirectories within this directory.
+
 Convert all DICOMS in a directory/series
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -207,21 +222,21 @@ sliceIndex:
 
 .. code:: bash
 
-    med2image -i SAG-anon/any-slice-name.dcm -d results -o sample --outputFileType jpg --sliceToConvert -1
+    med2image -i SAG-anon/any-slice-name.dcm -d dicom-results/all-slices -o sample --outputFileType jpg --sliceToConvert -1
 
-This will create the following files in the ``result`` directory
+This will create the following files in the ``all-slices`` sub-directory within ``dicom-results`` directory.
 
 ::
 
-    results//sample-slice000.jpg
-    results//sample-slice001.jpg
-    results//sample-slice002.jpg
-    results//sample-slice003.jpg
+    dicom-results/all-slices/sample-slice000.jpg
+    dicom-results/all-slices/sample-slice001.jpg
+    dicom-results/all-slices/sample-slice002.jpg
+    dicom-results/all-slices/sample-slice003.jpg
     ...
-    results//sample-slice188.jpg
-    results//sample-slice189.jpg
-    results//sample-slice190.jpg
-    results//sample-slice191.jpg
+    dicom-results/all-slices/sample-slice188.jpg
+    dicom-results/all-slices/sample-slice189.jpg
+    dicom-results/all-slices/sample-slice190.jpg
+    dicom-results/all-slices/sample-slice191.jpg
 
 **NOTE:**
 
@@ -243,27 +258,28 @@ directory). To do this, simply specify a m to --sliceToConvert (or -s m)
 
 .. code:: bash
 
-    med2image -i SAG-anon/slice-name.dcm -d results -o sample --outputFileType jpg --sliceToConvert m
+    med2image -i SAG-anon/slice-name.dcm -d dicom-results/middle-slice -o sample --outputFileType jpg --sliceToConvert m
 
-This will create the following files in the ``result`` directory
+This will create the following files in the ``middle-slice`` sub-directory within ``dicom-results`` directory.
 
 ::
 
-    results//sample-slice096.jpg
+    dicom-results/middle-slice/sample-slice096.jpg
+
 
 Alternatively a specific slice index can be converted. Use
 
 .. code:: bash
 
-    med2image -i SAG-anon/slice-name.dcm -d results -o sample --outputFileType jpg --sliceToConvert 20
+    med2image -i SAG-anon/slice-name.dcm -d dicom-results/specific-slice -o sample --outputFileType jpg --sliceToConvert 20
 
 to convert only the 20th slice of the volume.
 
-This will create the following files in the ``result`` directory
+This will create the following files in the ``specific-slice`` sub-directory within ``dicom-results`` directory.
 
 ::
 
-    results//sample-slice020.jpg
+    dicom-results/specific-slice/sample-slice020.jpg
 
 Multiple Direction Reslicing
 ----------------------------
