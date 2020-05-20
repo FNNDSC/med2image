@@ -21,11 +21,11 @@ Dependencies
 Make sure that the following dependencies are installed on your host
 system (or even better, a python3 virtual env):
 
--  ``pfmisc`` (a general miscellaneous module for color support, etc) 
--  ``nibabel`` (to read NIfTI files)
--  ``pydicom`` (to read DICOM files)
--  ``matplotlib`` (to save data in various image formats)
--  ``pillow`` (to save data in jpg format)
+-  ``pfmisc`` : (a general miscellaneous module for color support, etc)
+-  ``nibabel`` : (to read NIfTI files)
+-  ``pydicom`` : (to read DICOM files)
+-  ``matplotlib`` : (to save data in various image formats)
+-  ``pillow`` : (to save data in jpg format)
 
 Installation
 ~~~~~~~~~~~~
@@ -49,11 +49,9 @@ How to Use
 
 The med2image needs the following required arguments to run the application:
 
-- -i|--inputFile <inputFile>
-        Input file to convert. Typically a DICOM file or a nifti volume.
+- ``-i | --inputFile <inputFile>`` : Input file to convert. Typically a DICOM file or a nifti volume.
 
-- -d|--outputDir <outputDir>
-        The directory to contain the converted output image files.
+- ``-d | --outputDir <outputDir> :`` The directory to contain the converted output image files.
 
 .. code:: bash
 
@@ -138,6 +136,7 @@ NIfTI
      So, one `.nii` corresponds to multiple `.png` or `.jpg` file (slices)
 
 - The NIfTI input data can be in 2 forms:
+
     - 3D : Single `.nii` volume which has multiple slices
     - 4D : A directory with multiple `.nii` files (volumes)
 
@@ -148,12 +147,18 @@ Pull NIfTI
 
 The inputFile should be a NIfTI volume of the format ``.nii``
 
-- A sample volume can be found on Github at ``FNNDSC/SAG-anon-nii``. (https://github.com/FNNDSC/SAG-anon-nii.git)
+A sample volume can be found on Github at ``FNNDSC/SAG-anon-nii``. (https://github.com/FNNDSC/SAG-anon-nii.git)
 
-- This repository can be cloned and used as an input volume.
+- Clone this repository (``SAG-anon-nii``) to your local computer.
+- This directory contains a NIfTI volume with the name ``SAG-anon.nii``.
 
 Convert NIfTI
 ~~~~~~~~~~~~~
+
+**NOTE:**
+
+- If outputDir (-d) is not mentioned, the slice will get created in the current directory.
+- if `--sliceToConvert` argument is not specified, then it converts all the slices of the ``.nii`` volume by default.
 
 Both 3D and 4D NIfTI input data are understood. In the case of 4D NIfTI,
 a specific frame can be specified in conjunction with a specific slice
@@ -164,38 +169,35 @@ index. In most cases, only a slice is required since most NIfTI data is
 All slices in a volume
 ^^^^^^^^^^^^^^^^^^^^^^
 
-To convert all slices in an input NIfTI volume called vol.nii, to save
-the results in a directory called out and to use as output the file stem
-name image, do
+To convert all slices in the input NIfTI volume ``SAG-anon-nii/SAG-anon.nii``, to save
+the results in a directory called ``results``, to use as output the file stem
+name ``sample``, and to save the result in ``jpg`` format, do:
 
-``med2image -i vol.nii -d out -o image.jpg -s -1``
+::
+
+    med2image -i SAG-anon-nii/SAG-anon.nii -d results -o sample.jpg -s -1
 
 or equivalently and more verbosely,
 
 ::
 
-    med2image --inputFile vol.nii     --outputDir out      \
-              --outputFileStem image  --outputFileType jpg \
+    med2image --inputFile SAG-anon-nii/SAG-anon.nii     --outputDir results      \
+              --outputFileStem sample  --outputFileType jpg \
               --sliceToConvert -1
 
-This will create the following files in out
+This will create the following files in the ``result`` directory
 
 ::
 
-    image-slice000.jpg
-    image-slice001.jpg
-    image-slice002.jpg
-    image-slice003.jpg
-    image-slice004.jpg
-    image-slice005.jpg
-    image-slice006.jpg
-    image-slice007.jpg
+    results//sample-slice000.jpg
+    results//sample-slice001.jpg
+    results//sample-slice002.jpg
+    results//sample-slice003.jpg
     ...
-    image-slice049.jpg
-    image-slice050.jpg
-    image-slice051.jpg
-    image-slice052.jpg
-    image-slice053.jpg
+    results//sample-slice188.jpg
+    results//sample-slice189.jpg
+    results//sample-slice190.jpg
+    results//sample-slice191.jpg
 
 Convert only a single slice
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -204,13 +206,35 @@ Mostly, you'll probably only want to convert the "middle" slice in a
 volume (for example to generate a representative thumbnail of the
 volume). To do this, simply specify a m to --sliceToConvert (or -s m)
 
-``med2image -i input.nii -d out -o vol --outputFileType jpg --sliceToConvert m``
+::
+
+    med2image -i SAG-anon-nii/SAG-anon.nii -d results -o sample --outputFileType jpg --sliceToConvert m
+
+This will create the following files in the ``result`` directory
+
+::
+
+    results//sample-slice096.jpg
 
 Alternatively a specific slice index can be converted. Use
 
-``med2image -i input.nii -d out -o vol --outputFileType jpg --sliceToConvert 20``
+::
+
+    med2image -i SAG-anon-nii/SAG-anon.nii -d results -o sample --outputFileType jpg --sliceToConvert 20
 
 to convert only the 20th slice of the volume.
+
+This will create the following files in the ``result`` directory
+
+::
+
+    results//sample-slice020.jpg
+
+**NOTE:**
+
+- These samples below are run from within the current working directory which contains the ``SAG-anon-nii`` input data set directory.
+
+- If you are running the application from another working directory, make sure you provide the correct path for the ``--inputFile`` and ``--outputDir`` arguments
 
 DICOM
 -----
@@ -222,35 +246,13 @@ Pull DICOM
 
 The inputFile should be a DICOM file of the format ``.dcm``
 
+A sample directory of ``.dcm`` can be found on Github at ``FNNDSC/SAG-anon``. (https://github.com/FNNDSC/SAG-anon.git)
 
-- A sample volume can be found on Github at ``FNNDSC/SAG-anon``. (https://github.com/FNNDSC/SAG-anon.git)
-
-- This repository can be cloned and used as an input volume.
+- Clone this repository (``SAG-anon``) to your local computer.
+- This directory contains multiple DICOM files/slices.
 
 Convert DICOM
 ~~~~~~~~~~~~~
-
-Convert a single DICOM file
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-Mostly, you'll probably only want to convert the "middle" slice in a
-DICOM directory (for example to generate a representative thumbnail of the
-directory). To do this, simply specify a m to --sliceToConvert (or -s m)
-
-``med2image -i slice.dcm -d out -o slice --outputFileType jpg --sliceToConvert m``
-
-Alternatively a specific slice index can be converted. Use
-
-``med2image -i slice.dcm -d out -o slice --outputFileType jpg --sliceToConvert 20``
-
-to convert only the 20th slice of the volume.
-
-
-**Note:**
-
-- If outputDir (-d) is not mentioned, the slice will get created in the current directory.
-- if `--sliceToConvert` argument is not specified, then it converts all the `.dcm` files in the directory by default.
 
 Convert all DICOMS in a directory/series
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -258,11 +260,70 @@ Convert all DICOMS in a directory/series
 To convert all the DICOMS in a directory, simply specifiy a '-1' to the
 sliceIndex:
 
-``med2image -i inputDir/slice.dcm -d outputDir -o slice.jpg -s -1``
+::
 
-**Note:** that this assumes all the DICOM files in the directory inputDir
-belong to the same series.
+    med2image -i SAG-anon/any-slice-name.dcm -d results -o sample --outputFileType jpg --sliceToConvert -1
 
+This will create the following files in the ``result`` directory
+
+::
+
+    results//sample-slice000.jpg
+    results//sample-slice001.jpg
+    results//sample-slice002.jpg
+    results//sample-slice003.jpg
+    ...
+    results//sample-slice188.jpg
+    results//sample-slice189.jpg
+    results//sample-slice190.jpg
+    results//sample-slice191.jpg
+
+**NOTE:**
+
+- Even though any one ``.dcm`` from the directory is passed to the ``--inputFile`` argument, all the ``.dcm`` files/slices in the ``SAG-anon`` directory will be converted.
+
+Convert a single DICOM file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**NOTE:**
+
+- These samples below are run from within the current working directory which contains the ``SAG-anon`` input data set directory.
+
+- If you are running the application from another working directory, make sure you provide the correct path for the ``--inputFile`` and ``--outputDir`` arguments
+
+
+Mostly, you'll probably only want to convert the "middle" slice in a
+DICOM directory (for example to generate a representative thumbnail of the
+directory). To do this, simply specify a m to --sliceToConvert (or -s m)
+
+::
+
+    med2image -i SAG-anon/slice-name.dcm -d results -o sample --outputFileType jpg --sliceToConvert m
+
+This will create the following files in the ``result`` directory
+
+::
+
+    results//sample-slice096.jpg
+
+Alternatively a specific slice index can be converted. Use
+
+::
+
+    med2image -i SAG-anon/slice-name.dcm -d results -o sample --outputFileType jpg --sliceToConvert 20
+
+to convert only the 20th slice of the volume.
+
+This will create the following files in the ``result`` directory
+
+::
+
+    results//sample-slice020.jpg
+
+**NOTE:**
+
+- If outputDir (-d) is not mentioned, the slice will get created in the current directory.
+- if `--sliceToConvert` argument is not specified, then it converts all the `.dcm` files in the directory by default.
 
 Multiple Direction Reslicing
 ----------------------------
