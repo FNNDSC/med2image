@@ -47,7 +47,7 @@ Should you get an error about `python3-tk` not installed, simply do (for example
 How to Use
 ----------
 
-The ``med2image`` needs the following required arguments to run the application:
+``med2image`` needs the following required arguments to run the application:
 
 - ``-i | --inputFile <inputFile>`` : Input file to convert. Typically a DICOM file or a nifti volume.
 
