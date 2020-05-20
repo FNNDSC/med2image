@@ -97,8 +97,8 @@ Convert NIfTI
 
 **NOTE:**
 
-- If outputDir (-d) is not mentioned, the slice will get created in the current directory.
-- if `--sliceToConvert` argument is not specified, then it converts all the slices of the ``.nii`` volume by default.
+- If ``--outputDir (-d)`` is not mentioned, the slice will get created in the current directory.
+- if ``--sliceToConvert`` argument is not specified, then it converts all the slices of the ``.nii`` volume by default.
 
 Both 3D and 4D NIfTI input data are understood. In the case of 4D NIfTI,
 a specific frame can be specified in conjunction with a specific slice
@@ -184,7 +184,7 @@ DICOM
 Pull DICOM
 ~~~~~~~~~~
 
-The inputFile should be a DICOM file of the format ``.dcm``
+The ``inputFile`` should be a DICOM file of the format ``.dcm``
 
 A sample directory of ``.dcm`` can be found on Github at ``FNNDSC/SAG-anon``. (https://github.com/FNNDSC/SAG-anon.git)
 
@@ -193,6 +193,11 @@ A sample directory of ``.dcm`` can be found on Github at ``FNNDSC/SAG-anon``. (h
 
 Convert DICOM
 ~~~~~~~~~~~~~
+
+**NOTE:**
+
+- If ``--outputDir (-d)`` is not mentioned, the slice will get created in the current directory.
+- if ``--sliceToConvert`` argument is not specified, then it converts all the `.dcm` files in the directory by default.
 
 Convert all DICOMS in a directory/series
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -259,11 +264,6 @@ This will create the following files in the ``result`` directory
 ::
 
     results//sample-slice020.jpg
-
-**NOTE:**
-
-- If outputDir (-d) is not mentioned, the slice will get created in the current directory.
-- if `--sliceToConvert` argument is not specified, then it converts all the `.dcm` files in the directory by default.
 
 Multiple Direction Reslicing
 ----------------------------
