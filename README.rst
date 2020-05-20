@@ -113,13 +113,13 @@ To convert all slices in the input NIfTI volume ``SAG-anon-nii/SAG-anon.nii``, t
 the results in a directory called ``results``, to use as output the file stem
 name ``sample``, and to save the result in ``jpg`` format, do:
 
-::
+.. code:: bash
 
     med2image -i SAG-anon-nii/SAG-anon.nii -d results -o sample.jpg -s -1
 
 or equivalently and more verbosely,
 
-::
+.. code:: bash
 
     med2image --inputFile SAG-anon-nii/SAG-anon.nii     --outputDir results      \
               --outputFileStem sample  --outputFileType jpg \
@@ -146,7 +146,7 @@ Mostly, you'll probably only want to convert the "middle" slice in a
 volume (for example to generate a representative thumbnail of the
 volume). To do this, simply specify a m to --sliceToConvert (or -s m)
 
-::
+.. code:: bash
 
     med2image -i SAG-anon-nii/SAG-anon.nii -d results -o sample --outputFileType jpg --sliceToConvert m
 
@@ -158,7 +158,7 @@ This will create the following files in the ``result`` directory
 
 Alternatively a specific slice index can be converted. Use
 
-::
+.. code:: bash
 
     med2image -i SAG-anon-nii/SAG-anon.nii -d results -o sample --outputFileType jpg --sliceToConvert 20
 
@@ -205,7 +205,7 @@ Convert all DICOMS in a directory/series
 To convert all the DICOMS in a directory, simply specifiy a '-1' to the
 sliceIndex:
 
-::
+.. code:: bash
 
     med2image -i SAG-anon/any-slice-name.dcm -d results -o sample --outputFileType jpg --sliceToConvert -1
 
@@ -241,7 +241,7 @@ Mostly, you'll probably only want to convert the "middle" slice in a
 DICOM directory (for example to generate a representative thumbnail of the
 directory). To do this, simply specify a m to --sliceToConvert (or -s m)
 
-::
+.. code:: bash
 
     med2image -i SAG-anon/slice-name.dcm -d results -o sample --outputFileType jpg --sliceToConvert m
 
@@ -253,7 +253,7 @@ This will create the following files in the ``result`` directory
 
 Alternatively a specific slice index can be converted. Use
 
-::
+.. code:: bash
 
     med2image -i SAG-anon/slice-name.dcm -d results -o sample --outputFileType jpg --sliceToConvert 20
 
