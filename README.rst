@@ -280,7 +280,7 @@ Converted images are stored in subdirectories labeled x, y, and z.
 
 **NOTE:** In case of DICOM images, the `--reslice` option will work only if all slices in the directory are converted which means: ``--sliceToConvert -1``
 
-Command line arguments
+Command Line Arguments
 ----------------------
 
 ::
