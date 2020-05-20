@@ -53,6 +53,8 @@ The med2image needs the following required arguments to run the application:
 
 - ``-d | --outputDir <outputDir> :`` The directory to contain the converted output image files.
 
+**Example:**
+
 .. code:: bash
 
     med2image -i vol.nii -d out
@@ -60,6 +62,10 @@ The med2image needs the following required arguments to run the application:
     OR
 
     med2image -i file.dcm -d out
+
+** The following 2 sections: NIfTI and DICOM explain how to run the ``med2image`` app using different *Command Line Arguments*
+
+** More details about all required and optional Command Line Arguments can be found in the last section of this file.**
 
 Command line arguments
 ----------------------
