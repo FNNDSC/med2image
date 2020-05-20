@@ -67,75 +67,7 @@ The med2image needs the following required arguments to run the application:
 
 - The following 2 sections: NIfTI and DICOM explain how to run the ``med2image`` app using different *Command Line Arguments*
 
-- More details about all required and optional Command Line Arguments can be found in the last section of this file.
-
-Command line arguments
-----------------------
-
-::
-
-        -i|--inputFile <inputFile>
-        Input file to convert. Typically a DICOM file or a nifti volume.
-
-        [-d|--outputDir <outputDir>]
-        The directory to contain the converted output image files.
-
-        -o|--outputFileStem <outputFileStem>
-        The output file stem to store conversion. If this is specified
-        with an extension, this extension will be used to specify the
-        output file type.
-
-        SPECIAL CASES:
-        For DICOM data, the <outputFileStem> can be set to the value of
-        an internal DICOM tag. The tag is specified by preceding the tag
-        name with a percent character '%', so
-
-            -o %ProtocolName
-
-        will use the DICOM 'ProtocolName' to name the output file. Note
-        that special characters (like spaces) in the DICOM value are
-        replaced by underscores '_'.
-
-        Multiple tags can be specified, for example
-
-            -o %PatientName%PatientID%ProtocolName
-
-        and the output filename will have each DICOM tag string as
-        specified in order, connected with dashes.
-
-        A special %inputFile is available to specify the input file that
-        was read (without extension).
-
-        [-t|--outputFileType <outputFileType>]
-        The output file type. If different to <outputFileStem> extension,
-        will override extension in favour of <outputFileType>.
-
-        [-s|--sliceToConvert <sliceToConvert>]
-        In the case of volume files, the slice (z) index to convert. Ignored
-        for 2D input data. If a '-1' is sent, then convert *all* the slices.
-        If an 'm' is specified, only convert the middle slice in an input
-        volume.
-
-        [-f|--frameToConvert <sliceToConvert>]
-        In the case of 4D volume files, the volume (V) containing the
-        slice (z) index to convert. Ignored for 3D input data. If a '-1' is
-        sent, then convert *all* the frames. If an 'm' is specified, only
-        convert the middle frame in the 4D input stack.
-
-        [--showSlices]
-        If specified, render/show image slices as they are created.
-
-        [--reslice]
-        For 3D data only. Assuming [i,j,k] coordinates, the default is to save
-        along the 'k' direction. By passing a --reslice image data in the 'i' and
-        'j' directions are also saved. Furthermore, the <outputDir> is subdivided into
-        'slice' (k), 'row' (i), and 'col' (j) subdirectories.
-
-        [-x|--man]
-        Show full help.
-
-        [-y|--synopsis]
-        Show brief help.
+- More details about all required and optional *Command Line Arguments* can be found in the last section of this file.
 
 NIfTI
 -----
@@ -347,3 +279,71 @@ and y correspond to planes normal to the row and column directions.
 Converted images are stored in subdirectories labeled x, y, and z.
 
 **NOTE:** In case of DICOM images, the `--reslice` option will work only if all slices in the directory are converted which means: ``--sliceToConvert -1``
+
+Command line arguments
+----------------------
+
+::
+
+        -i|--inputFile <inputFile>
+        Input file to convert. Typically a DICOM file or a nifti volume.
+
+        [-d|--outputDir <outputDir>]
+        The directory to contain the converted output image files.
+
+        -o|--outputFileStem <outputFileStem>
+        The output file stem to store conversion. If this is specified
+        with an extension, this extension will be used to specify the
+        output file type.
+
+        SPECIAL CASES:
+        For DICOM data, the <outputFileStem> can be set to the value of
+        an internal DICOM tag. The tag is specified by preceding the tag
+        name with a percent character '%', so
+
+            -o %ProtocolName
+
+        will use the DICOM 'ProtocolName' to name the output file. Note
+        that special characters (like spaces) in the DICOM value are
+        replaced by underscores '_'.
+
+        Multiple tags can be specified, for example
+
+            -o %PatientName%PatientID%ProtocolName
+
+        and the output filename will have each DICOM tag string as
+        specified in order, connected with dashes.
+
+        A special %inputFile is available to specify the input file that
+        was read (without extension).
+
+        [-t|--outputFileType <outputFileType>]
+        The output file type. If different to <outputFileStem> extension,
+        will override extension in favour of <outputFileType>.
+
+        [-s|--sliceToConvert <sliceToConvert>]
+        In the case of volume files, the slice (z) index to convert. Ignored
+        for 2D input data. If a '-1' is sent, then convert *all* the slices.
+        If an 'm' is specified, only convert the middle slice in an input
+        volume.
+
+        [-f|--frameToConvert <sliceToConvert>]
+        In the case of 4D volume files, the volume (V) containing the
+        slice (z) index to convert. Ignored for 3D input data. If a '-1' is
+        sent, then convert *all* the frames. If an 'm' is specified, only
+        convert the middle frame in the 4D input stack.
+
+        [--showSlices]
+        If specified, render/show image slices as they are created.
+
+        [--reslice]
+        For 3D data only. Assuming [i,j,k] coordinates, the default is to save
+        along the 'k' direction. By passing a --reslice image data in the 'i' and
+        'j' directions are also saved. Furthermore, the <outputDir> is subdivided into
+        'slice' (k), 'row' (i), and 'col' (j) subdirectories.
+
+        [-x|--man]
+        Show full help.
+
+        [-y|--synopsis]
+        Show brief help.
