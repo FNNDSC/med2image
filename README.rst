@@ -198,6 +198,12 @@ The ``inputFile`` should be a DICOM file of the format ``.dcm``
 A sample directory of ``.dcm`` can be found on Github at ``FNNDSC/SAG-anon``. (https://github.com/FNNDSC/SAG-anon.git)
 
 - Clone this repository (``SAG-anon``) to your local computer.
+
+.. code:: bash
+
+    git clone https://github.com/FNNDSC/SAG-anon.git
+
+- This will create a folder called ``SAG-anon`` in the current working directory.
 - This directory contains multiple DICOM files/slices.
 
 Convert DICOM
