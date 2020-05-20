@@ -73,7 +73,7 @@ NIfTI
 -----
 **NOTE:** One NIfTI (`.nii`) is one entire volume of multiple slices.
 
-     So, one `.nii` corresponds to multiple `.png` or `.jpg` file (slices)
+So, one `.nii` corresponds to multiple `.png` or `.jpg` file (slices)
 
 - The NIfTI input data can be in 2 forms:
 
