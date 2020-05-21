@@ -153,7 +153,7 @@ Convert only a single slice
 
 Mostly, you'll probably only want to convert the "middle" slice in a
 volume (for example to generate a representative thumbnail of the
-volume). To do this, simply specify a m to --sliceToConvert (or -s m)
+volume). To do this, simply specify an ``m`` to ``--sliceToConvert`` (or ``-s m``)
 
 .. code:: bash
 
