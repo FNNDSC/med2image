@@ -216,7 +216,7 @@ Convert DICOM
 
 **NOTE:**
 
-- Create a folder called ``dicom-results`` in the current working directory which also contains the input data set ``SAG-anon-nii``
+- Create a folder called ``dicom-results`` in the current working directory which also contains the input data set ``SAG-anon``
 
 - We will be storing all results in subdirectories within this directory.
 
