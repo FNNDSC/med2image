@@ -282,6 +282,8 @@ if args.man or args.synopsis:
     print(str_help)
     sys.exit(1)
 
+# sys.exit(0)
+# pudb.set_trace()
 # Create the object
 imgConverter    = med2image.object_factoryCreate(args).C_convert
 

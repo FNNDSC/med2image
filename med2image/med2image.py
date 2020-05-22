@@ -180,6 +180,7 @@ class med2image(object):
     @staticmethod
     def urlify(astr, astr_join = '_'):
         # Remove all non-word characters (everything except numbers and letters)
+        # pudb.set_trace()
         astr = re.sub(r"[^\w\s]", '', astr)
 
         # Replace all runs of whitespace with an underscore
@@ -505,7 +506,8 @@ class med2image_dcm(med2image):
                     str_fileName, str_ext = os.path.splitext(self.str_inputFile)
                     str_fileComponent = str_fileName
                 else:
-                    str_fileComponent = eval('self._dcm.%s' % key)
+                    # pudb.set_trace()
+                    str_fileComponent = eval('str(self._dcm.%s)' % key)
                     str_fileComponent = med2image.urlify(str_fileComponent)
                 if not len(self.str_outputFileStem):
                     self.str_outputFileStem = str_fileComponent

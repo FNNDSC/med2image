@@ -287,6 +287,10 @@ This will create the following files in the ``specific-slice`` sub-directory wit
 
     dicom-results/specific-slice/sample-slice020.jpg
 
+Special Cases
+^^^^^^^^^^^^^
+
+
 Multiple Direction Reslicing
 ----------------------------
 
