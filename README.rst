@@ -290,6 +290,43 @@ This will create the following files in the ``specific-slice`` sub-directory wit
 Special Cases
 ^^^^^^^^^^^^^
 
+For DICOM data, the <outputFileStem> can be set to the value of
+an internal DICOM tag. The tag is specified by preceding the tag
+name with a percent character '%', so
+
+    ``-o %PatientID``
+
+will use the DICOM 'PatientID' to name the output file. Note
+that special characters (like spaces) in the DICOM value are
+replaced by underscores '_'.
+
+.. code:: bash
+
+    med2image -i SAG-anon/slice-name.dcm -d dicom-results/tags -o %PatientID.jpg -s m
+
+This will create the following file in the ``tags`` sub-directory within ``dicom-results`` directory.
+
+.. code:: bash
+
+    dicom-results/tags/1449c1d.jpg
+
+Multiple tags can be specified, for example
+
+    ``-o %PatientName%PatientID%ProtocolName``
+
+and the output filename will have each DICOM tag string as
+specified in order, connected with dashes.
+
+.. code:: bash
+
+    med2image -i SAG-anon/slice-name.dcm -d dicom-results/tags -o %PatientName%PatientID%ProtocolName.jpg -s m
+
+This will create the following file in the ``tags`` sub-directory within ``dicom-results`` directory.
+
+.. code:: bash
+
+    dicom-results/tags/anonymized-1449c1d-SAG_MPRAGE_220_FOV.jpg
+
 
 Multiple Direction Reslicing
 ----------------------------
