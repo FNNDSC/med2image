@@ -377,9 +377,6 @@ Command Line Arguments
         and the output filename will have each DICOM tag string as
         specified in order, connected with dashes.
 
-        A special %inputFile is available to specify the input file that
-        was read (without extension).
-
         [-t|--outputFileType <outputFileType>]
         The output file type. If different to <outputFileStem> extension,
         will override extension in favour of <outputFileType>.
