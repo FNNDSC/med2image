@@ -1,4 +1,4 @@
-med2image -- 2.1.1
+med2image 2.1.1
 ==================
 
 Quick Overview
@@ -58,8 +58,10 @@ How to Use
 .. code:: bash
 
     med2image -i vol.nii -d out
+    
+OR
 
-    OR
+.. code:: bash
 
     med2image -i file.dcm -d out
 
@@ -76,10 +78,8 @@ NIfTI
 So, one `.nii` corresponds to multiple `.png` or `.jpg` file (slices)
 
 - The NIfTI input data can be in 2 forms:
-
-    - 3D : Single `.nii` volume which has multiple slices
-    - 4D : A directory with multiple `.nii` files (volumes)
-
+  - 3D : Single `.nii` volume which has multiple slices
+  - 4D : A directory with multiple `.nii` files (volumes)
 - The application understands both types of inputs.
 
 Pull NIfTI
@@ -130,7 +130,8 @@ or equivalently and more verbosely,
 
 .. code:: bash
 
-    med2image --inputFile SAG-anon-nii/SAG-anon.nii     --outputDir nifti-results/all-slices      \
+    med2image --inputFile SAG-anon-nii/SAG-anon.nii         \
+              --outputDir nifti-results/all-slices          \
               --outputFileStem sample  --outputFileType jpg \
               --sliceToConvert -1
 
@@ -157,7 +158,10 @@ volume). To do this, simply specify an ``m`` to ``--sliceToConvert`` (or ``-s m`
 
 .. code:: bash
 
-    med2image -i SAG-anon-nii/SAG-anon.nii -d nifti-results/middle-slice -o sample --outputFileType jpg --sliceToConvert m
+    med2image -i SAG-anon-nii/SAG-anon.nii    \
+              -d nifti-results/middle-slice   \
+              -o sample --outputFileType jpg  \
+              --sliceToConvert m
 
 This will create the following files in the ``middle-slice`` sub-directory within ``nifti-results`` directory.
 
@@ -228,7 +232,11 @@ sliceIndex:
 
 .. code:: bash
 
-    med2image -i SAG-anon/any-slice-name.dcm -d dicom-results/all-slices -o sample --outputFileType jpg --sliceToConvert -1
+    med2image -i SAG-anon/any-slice-name.dcm   \
+              -d dicom-results/all-slices      \
+              -o sample                        \
+              --outputFileType jpg             \
+              --sliceToConvert -1
 
 This will create the following files in the ``all-slices`` sub-directory within ``dicom-results`` directory.
 
@@ -258,13 +266,14 @@ Convert a single DICOM file
 - If you are running the application from another working directory, make sure you provide the correct path for the ``--inputFile`` and ``--outputDir`` arguments
 
 
-Mostly, you'll probably only want to convert the "middle" slice in a
-DICOM directory (for example to generate a representative thumbnail of the
-directory). To do this, simply specify a m to --sliceToConvert (or -s m)
+Mostly, you'll probably only want to convert the "middle" slice in a DICOM directory (for example to generate a representative thumbnail of the directory). To do this, simply specify a `m` to --sliceToConvert (or `-s m`)
 
 .. code:: bash
 
-    med2image -i SAG-anon/slice-name.dcm -d dicom-results/middle-slice -o sample --outputFileType jpg --sliceToConvert m
+    med2image -i SAG-anon/slice-name.dcm     \
+              -d dicom-results/middle-slice  \
+              -o sample --outputFileType jpg \
+              --sliceToConvert m
 
 This will create the following files in the ``middle-slice`` sub-directory within ``dicom-results`` directory.
 
@@ -277,7 +286,10 @@ Alternatively a specific slice index can be converted. Use
 
 .. code:: bash
 
-    med2image -i SAG-anon/slice-name.dcm -d dicom-results/specific-slice -o sample --outputFileType jpg --sliceToConvert 20
+    med2image -i SAG-anon/slice-name.dcm       \
+              -d dicom-results/specific-slice  \
+              -o sample --outputFileType jpg   \
+              --sliceToConvert 20
 
 to convert only the 20th slice of the volume.
 
@@ -290,19 +302,17 @@ This will create the following files in the ``specific-slice`` sub-directory wit
 Special Cases
 ^^^^^^^^^^^^^
 
-For DICOM data, the <outputFileStem> can be set to the value of
-an internal DICOM tag. The tag is specified by preceding the tag
-name with a percent character '%', so
+For DICOM data, the <outputFileStem> can be set to the value of an internal DICOM tag. The tag is specified by preceding the tag name with a percent character '%', so
 
     ``-o %PatientID``
 
-will use the DICOM 'PatientID' to name the output file. Note
-that special characters (like spaces) in the DICOM value are
-replaced by underscores '_'.
+will use the DICOM 'PatientID' to name the output file. Note that special characters (like spaces) in the DICOM value are replaced by underscores '_'.
 
 .. code:: bash
 
-    med2image -i SAG-anon/slice-name.dcm -d dicom-results/tags -o %PatientID.jpg -s m
+    med2image -i SAG-anon/slice-name.dcm    \
+              -d dicom-results/tags         \
+              -o %PatientID.jpg -s m
 
 This will create the following file in the ``tags`` sub-directory within ``dicom-results`` directory.
 
@@ -319,7 +329,10 @@ specified in order, connected with dashes.
 
 .. code:: bash
 
-    med2image -i SAG-anon/slice-name.dcm -d dicom-results/tags -o %PatientName%PatientID%ProtocolName.jpg -s m
+    med2image -i SAG-anon/slice-name.dcm                   \
+              -d dicom-results/tags                        \
+              -o %PatientName%PatientID%ProtocolName.jpg   \
+              -s m
 
 This will create the following file in the ``tags`` sub-directory within ``dicom-results`` directory.
 
