@@ -173,7 +173,11 @@ Alternatively a specific slice index can be converted. Use
 
 .. code:: bash
 
-    med2image -i SAG-anon-nii/SAG-anon.nii -d nifti-results/specific-slice -o sample --outputFileType jpg --sliceToConvert 20
+    med2image -i SAG-anon-nii/SAG-anon.nii    \
+              -d nifti-results/specific-slice \
+              -o sample                       \
+              --outputFileType jpg            \
+              --sliceToConvert 20
 
 to convert only the 20th slice of the volume.
 
