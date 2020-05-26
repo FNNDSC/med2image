@@ -1,4 +1,4 @@
-med2image 2.1.1
+med2image 2.2.0
 ==================
 
 Quick Overview
@@ -363,6 +363,10 @@ Command Line Arguments
 
         -i|--inputFile <inputFile>
         Input file to convert. Typically a DICOM file or a nifti volume.
+
+        [-I|--inputDir <inputDir>]
+        If specified, a directory containing the <inputFile>. In this case
+        <inputFile> should be specified as relative to <inputDir>.
 
         [-d|--outputDir <outputDir>]
         The directory to contain the converted output image files.

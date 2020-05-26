@@ -12,7 +12,7 @@ def readme():
 
 setup(
       name             =   'med2image',
-      version          =   '2.1.1',
+      version          =   '2.2.0',
       description      =   '(Python) utility to convert medical images to jpg and png',
       long_description =   readme(),
       author           =   'FNNDSC',
