@@ -106,7 +106,7 @@ The input should be a ``NIfTI`` volume with extension ``.nii``. We provide a sam
     git clone https://github.com/FNNDSC/SAG-anon-nii.git
 
 Convert ``NIfTI``
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 
 **NOTE:**
 
