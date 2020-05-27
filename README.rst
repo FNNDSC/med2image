@@ -9,7 +9,7 @@ Quick Overview
 Overview
 --------
 
-``med2image`` is a simple Python3 utility that converts medical image formatted files (such as ``DICOM`` and ``NifTI``) to more visual friendly ones, such as ``png`` and ``jpg``.
+``med2image`` is a simple Python3 utility that converts medical image formatted files (such as ``DICOM`` and ``NifTI``) to more web friendly ones, such as ``png`` and ``jpg``.
 
 Currently, ``NIfTI`` and ``DICOM`` input formats are understood, while any graphical output type that is supported by matplotlib can be generated.
 
@@ -18,7 +18,7 @@ At present ``med2image`` does not convert ``DICOM`` to ``NifTI``, but this is pl
 Dependencies
 ------------
 
-Make sure that the following dependencies are installed on your host system (or even better, a python3 virtual env):
+Make sure that the following dependencies are installed on your host system (or even better, a ``python3`` virtual env):
 
 -  ``pfmisc`` : (a general miscellaneous module for color support, etc)
 -  ``nibabel`` : (to read NIfTI files)
@@ -47,7 +47,7 @@ How to Use
 
 ``med2image`` needs at a minimum the following required command line arguments:
 
-- ``-i | --inputFile <inputFile>`` : Input file to convert. Typically a DICOM file or a nifti volume.
+- ``-i | --inputFile <inputFile>`` : Input file to convert. Typically a ``DICOM`` file or a ``NifTI`` volume.
 
 - ``-d | --outputDir <outputDir> :`` The directory to contain the converted output image files.
 
@@ -62,8 +62,6 @@ How to Use
 
     med2image -i vol.nii -d out
     
-            OR
-
 .. code:: bash
 
     # Convert a DICOM file 'file.dcm' to JPEG and store 
@@ -81,11 +79,11 @@ How to Use
 ``NIfTI`` details
 -----------------
 
-**NOTE:** ``NifTI`` is typically a *volume* format. One ``NIfTI`` (``.nii``) volume contains multiple *slices*. Converting a ``NifTI`` volume results in multiple `.jpg` or `.png` results.
+**NOTE:** ``NifTI`` is typically a *volume* format. One ``NIfTI`` (``.nii``) volume contains multiple *slices*. Converting a ``NifTI`` volume results in multiple ``.jpg`` or ``.png`` results.
 
 - ``NIfTI`` input data can be in 2 forms:
-  - 3D : Single `.nii` volume which has multiple slices
-  - 4D : A directory with multiple `.nii` files (volumes)
+  - 3D : The ``.nii`` volume contains multiple 2D slices
+  - 4D : The ``.nii`` file contains multiple 3D volumes that each contain multiple 2D slices
 - ``med2image`` understands both types of inputs.
 
 Pull ``NIfTI``
