@@ -1,4 +1,4 @@
-med2image 2.2.0
+med2image 2.2.2
 ==================
 
 Quick Overview
@@ -411,6 +411,13 @@ Command Line Arguments
 
         [--showSlices]
         If specified, render/show image slices as they are created.
+
+        [--func <functionName>]
+        Apply the specified transformation function before saving. Currently
+        support functions:
+
+            * invertIntensities
+              Inverts the contrast intensity of the source image.
 
         [--reslice]
         For 3D data only. Assuming [i,j,k] coordinates, the default is to save
