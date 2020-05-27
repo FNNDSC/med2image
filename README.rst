@@ -26,6 +26,11 @@ Make sure that the following dependencies are installed on your host system (or 
 -  ``matplotlib`` : (to save data in various image formats)
 -  ``pillow`` : (to save data in ``jpg`` format)
 
+Assumptions
+-----------
+
+This document assumes UNIX conventions and a ``bash`` shell. The script should work fine under Windows, but we have not actively tested on that platform -- our dev envs are Linux Ubuntu and macOS.
+
 Installation
 ~~~~~~~~~~~~
 
@@ -35,7 +40,7 @@ The best method of installing this script and all of its dependencies is by fetc
 
         pip3 install med2image
 
-Should you get an error about `python3-tk` not installed, simply do (for example on Ubuntu):
+Should you get an error about ``python3-tk`` not installed, simply do (for example on Ubuntu):
 
 .. code:: bash
 
