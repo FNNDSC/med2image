@@ -136,7 +136,7 @@ or equivalently and more verbosely,
               --outputFileStem sample  --outputFileType jpg \
               --sliceToConvert -1
 
-This will create the following files in the ``all-slices`` sub-directory within ``nifti-results`` directory. Note that even if the nested output directory structure does not exist, ``med2image`` will create it for you.
+resulting in
 
 ::
 
@@ -150,6 +150,8 @@ This will create the following files in the ``all-slices`` sub-directory within 
     nifti-results/all-slices/sample-slice190.jpg
     nifti-results/all-slices/sample-slice191.jpg
 
+Note that even if the nested output directory structure does not exist, ``med2image`` will create it for you.
+
 Case 2: Convert only a single slice
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -162,7 +164,7 @@ Often times, you might only want to convert the "middle" slice in a volume (for 
               -o sample --outputFileType jpg  \
               --sliceToConvert m
 
-This will create a single file in the ``middle-slice`` sub-directory within ``nifti-results`` directory.
+resulting in
 
 ::
 
@@ -180,17 +182,11 @@ Alternatively a specific slice index can be converted. Use
 
 to convert only the 20th slice of the volume.
 
-This will create a single output file in the ``specific-slice`` sub-directory within ``nifti-results`` directory.
+resulting in
 
 ::
 
     nifti-results/specific-slice/sample-slice020.jpg
-
-**NOTE:**
-
-- These samples below are run from within the current working directory which contains the ``SAG-anon-nii`` input data set directory.
-
-- If you are running the application from another working directory, make sure you provide the correct path for the ``--inputFile`` and ``--outputDir`` arguments
 
 ``DICOM``
 ---------
@@ -209,9 +205,6 @@ We provide a sample directory of ``.dcm`` images here ``FNNDSC/SAG-anon``. (http
 .. code:: bash
 
     git clone https://github.com/FNNDSC/SAG-anon.git
-
-- This will create a folder called ``SAG-anon`` in the current working directory.
-- This directory contains multiple DICOM files/slices.
 
 Convert ``DICOM``
 ~~~~~~~~~~~~~~~~~
@@ -243,7 +236,7 @@ To convert all the ``DICOM``S in a directory, simply specify either ``--sliceToC
               --outputFileType jpg             
 
 
-This will create the following files in the ``dicom-results/all-slices``:
+resulting in
 
 ::
 
@@ -269,7 +262,7 @@ Mostly, you'll probably only want to convert the "middle" slice in a DICOM direc
               -o sample --outputFileType jpg \
               --sliceToConvert m
 
-This will create the following file in the ``middle-slice`` sub-directory within ``dicom-results`` directory.
+resulting in
 
 ::
 
@@ -285,7 +278,7 @@ Alternatively a specific slice index can be converted. Use
               -o sample --outputFileType jpg   \
               --sliceToConvert 20
 
-to convert only the 20th slice of the volume and create the following file in the ``specific-slice`` sub-directory within ``dicom-results`` directory.
+resulting in
 
 ::
 
@@ -339,14 +332,14 @@ By default, only the slice (or slices) in the acquisition direction are converte
 
 The ``z`` direction is the original acquistion (slice) direction, while ``x`` and ``y`` correspond to planes normal to the row and column directions. Converted images are stored in subdirectories labeled ``x``, ``y``, and ``z``.
 
-**NOTE:** No interpolation in the ``x`` and ``y`` directions is performed. This often results in ugly images!
+No interpolation in the ``x`` and ``y`` directions is performed. This often results in ugly images!
 
 **NOTE:** In case of ``DICOM`` images, the `--reslice` option will work only if all slices in the directory are converted, i.e. converting with ``--sliceToConvert -1``
 
 Special Operations
 ------------------
 
-``med2image`` also supports some very basic image processing (currently in their infancy) through a ``--func <functionName>]`` CLI, which applies some canned transformation on the image. Currently supported is 
+``med2image`` also supports some very basic image processing through a ``--func <functionName>`` CLI, which applies some canned transformation on the image. Currently supported is 
 
 ::
     --func invertIntensities
