@@ -315,7 +315,7 @@ This will create the following file in the ``tags`` sub-directory within ``dicom
 
 Multiple tags can be specified, for example
 
-    ``-o %PatientName%PatientID%ProtocolName``
+- ``-o %PatientName%PatientID%ProtocolName``
 
 and the output filename will have each ``DICOM`` tag string as specified in order, connected with dashes.
 
@@ -350,6 +350,7 @@ Special Operations
 ``med2image`` also supports some very basic image processing through a ``--func <functionName>`` CLI, which applies some canned transformation on the image. Currently supported is 
 
 ::
+
     --func invertIntensities
     
 which simply inverts the contrast intensity of the source image. Additional functions are planned for future releases.
