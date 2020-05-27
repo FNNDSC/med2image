@@ -295,15 +295,15 @@ Again, even though the first slice was supplied to the script, ``med2image`` sel
 Special Cases
 ^^^^^^^^^^^^^
 
-For ``DICOM`` data, the <outputFileStem> can optionally be set to the value of an internal DICOM tag. The tag is specified by preceding the tag name with a percent character '%', so
+For ``DICOM`` data, the ``<outputFileStem>`` can optionally be set to the value of an internal ``DICOM`` tag. The tag is specified by preceding the tag name with a percent character ``%``, so
 
-    ``-o %PatientID``
+- ``-o %PatientID``
 
-will use the ``DICOM`` ``PatientID`` to name the output file. Note that special characters (like spaces) in the DICOM value are replaced by underscores '_'.
+will use the ``DICOM`` ``PatientID`` to name the output file. Note that special characters (like spaces) in the ``DICOM`` value are replaced by underscores '_'.
 
 .. code:: bash
 
-    med2image -i SAG-anon/slice-name.dcm    \
+    med2image -i SAG-anon/0001-1.3.12.2.1107.5.2.19.45152.2013030808110258929186035.dcm   \
               -d dicom-results/tags         \
               -o %PatientID.jpg -s m
 
@@ -317,11 +317,11 @@ Multiple tags can be specified, for example
 
     ``-o %PatientName%PatientID%ProtocolName``
 
-and the output filename will have each DICOM tag string as specified in order, connected with dashes.
+and the output filename will have each ``DICOM`` tag string as specified in order, connected with dashes.
 
 .. code:: bash
 
-    med2image -i SAG-anon/slice-name.dcm                   \
+    med2image -i SAG-anon/0001-1.3.12.2.1107.5.2.19.45152.2013030808110258929186035.dcm \
               -d dicom-results/tags                        \
               -o %PatientName%PatientID%ProtocolName.jpg   \
               -s m
