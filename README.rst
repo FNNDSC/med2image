@@ -1,4 +1,4 @@
-med2image 2.2.2
+med2image 2.2.4
 ==================
 
 Quick Overview
@@ -95,7 +95,7 @@ How to Use
 - ``med2image`` understands both types of inputs.
 
 Pull ``NIfTI``
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 The input should be a ``NIfTI`` volume with extension ``.nii``. We provide a sample volume here https://github.com/FNNDSC/SAG-anon-nii.git
 
