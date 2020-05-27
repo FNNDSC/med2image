@@ -223,7 +223,7 @@ Convert ``DICOM``
 Convert all DICOMS in a directory/series
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To convert all the ``DICOM``S in a directory, simply specify either ``--sliceToConvert -1`` (or just leave out the argument/value pair completely):
+To convert all the ``DICOM`` files in a directory, simply specify either ``--sliceToConvert -1`` (or just leave out the argument/value pair completely):
 
 .. code:: bash
 
