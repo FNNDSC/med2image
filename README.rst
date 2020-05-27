@@ -196,12 +196,12 @@ resulting in
 ``DICOM``
 ---------
 
-**NOTE:** One DICOM (`.dcm`) file typically corresponds to one `.png` or `.jpg` file (slice).
+**NOTE:** One ``DICOM`` (``.dcm``) file typically corresponds to one ``.png`` or ``.jpg`` file (slice).
 
 Pull DICOM
 ~~~~~~~~~~
 
-The ``inputFile`` should be a ``DICOM`` file usually with extension ``.dcm``
+The input should be a ``DICOM`` file usually with extension ``.dcm``
 
 We provide a sample directory of ``.dcm`` images here ``FNNDSC/SAG-anon``. (https://github.com/FNNDSC/SAG-anon.git)
 
@@ -227,7 +227,7 @@ To convert all the ``DICOM``S in a directory, simply specify either ``--sliceToC
 
 .. code:: bash
 
-    med2image -i SAG-anon/any-slice-name.dcm   \
+    med2image -i SAG-anon/0001-1.3.12.2.1107.5.2.19.45152.2013030808110258929186035.dcm   \
               -d dicom-results/all-slices      \
               -o sample                        \
               --outputFileType jpg             \
@@ -235,7 +235,7 @@ To convert all the ``DICOM``S in a directory, simply specify either ``--sliceToC
 
     # OR equivalently
 
-    med2image -i SAG-anon/any-slice-name.dcm   \
+    med2image -i SAG-anon/0001-1.3.12.2.1107.5.2.19.45152.2013030808110258929186035.dcm  \
               -d dicom-results/all-slices      \
               -o sample                        \
               --outputFileType jpg             
@@ -262,7 +262,7 @@ Mostly, you'll probably only want to convert the "middle" slice in a DICOM direc
 
 .. code:: bash
 
-    med2image -i SAG-anon/slice-name.dcm     \
+    med2image -i SAG-anon/0001-1.3.12.2.1107.5.2.19.45152.2013030808110258929186035.dcm    \
               -d dicom-results/middle-slice  \
               -o sample --outputFileType jpg \
               --sliceToConvert m
@@ -271,14 +271,15 @@ resulting in
 
 ::
 
-    dicom-results/middle-slice/sample-slice096.jpg
+    dicom-results/middle-slice/sample.jpg
 
+Note that even though the first slice in the ``SAG-anon`` directory was supplied to the script, ``med2image`` nonetheless found and converted the middle slice in the directory.
 
 Alternatively a specific slice index can be converted. Use
 
 .. code:: bash
 
-    med2image -i SAG-anon/slice-name.dcm       \
+    med2image -i SAG-anon/0001-1.3.12.2.1107.5.2.19.45152.2013030808110258929186035.dcm     \
               -d dicom-results/specific-slice  \
               -o sample --outputFileType jpg   \
               --sliceToConvert 20
@@ -287,7 +288,9 @@ resulting in
 
 ::
 
-    dicom-results/specific-slice/sample-slice020.jpg
+    dicom-results/specific-slice/sample.jpg
+
+Again, even though the first slice was supplied to the script, ``med2image`` selected and converted the 20th slice in the directory.
 
 Special Cases
 ^^^^^^^^^^^^^
