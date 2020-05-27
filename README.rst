@@ -92,16 +92,13 @@ How to Use
 Pull ``NIfTI``
 ~~~~~~~~~~~~~
 
-The inputFile should be a ``NIfTI`` volume with extension ``.nii``. We provide a sample volume here ``FNNDSC/SAG-anon-nii``. (https://github.com/FNNDSC/SAG-anon-nii.git)
+The inputFile should be a ``NIfTI`` volume with extension ``.nii``. We provide a sample volume here https://github.com/FNNDSC/SAG-anon-nii.git
 
 - Clone this repository (``SAG-anon-nii``) to your local computer.
 
 .. code:: bash
 
     git clone https://github.com/FNNDSC/SAG-anon-nii.git
-
-- This will create a folder called ``SAG-anon-nii`` in the current working directory.
-- This directory will contain a NIfTI volume with the name ``SAG-anon.nii``.
 
 Convert ``NIfTI``
 ~~~~~~~~~~~~~
