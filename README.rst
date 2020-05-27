@@ -82,8 +82,11 @@ How to Use
 **NOTE:** ``NifTI`` is typically a *volume* format. One ``NIfTI`` (``.nii``) volume contains multiple *slices*. Converting a ``NifTI`` volume results in multiple ``.jpg`` or ``.png`` results.
 
 - ``NIfTI`` input data can be in 2 forms:
+
   - 3D : The ``.nii`` volume contains multiple 2D slices
+
   - 4D : The ``.nii`` file contains multiple 3D volumes that each contain multiple 2D slices
+
 - ``med2image`` understands both types of inputs.
 
 Pull ``NIfTI``
