@@ -34,7 +34,10 @@ This document assumes UNIX conventions and a ``bash`` shell. The script should w
 Installation
 ~~~~~~~~~~~~
 
-The best method of installing this script and all of its dependencies is by fetching it from `PyPI <https://pypi.org/project/med2image/>`_.
+Python module
+~~~~~~~~~~~~~
+
+One method of installing this script and all of its dependencies is by fetching it from `PyPI <https://pypi.org/project/med2image/>`_.
 
 .. code:: bash
 
@@ -46,6 +49,11 @@ Should you get an error about ``python3-tk`` not installed, simply do (for examp
 
         sudo apt-get update
         sudo apt-get install -y python3-tk
+
+Docker container
+~~~~~~~~~~~~~~~~
+
+We also offer a docker container of ``med2image`` as a ChRIS-conformant platform plugin here https://github.com/FNNDSC/pl-med2img -- please consult that page for information on running the dockerized container. The containerized version exposes a similar CLI and functionality as this module.
 
 How to Use
 ----------
