@@ -21,7 +21,7 @@ from    pfmisc._colors      import Colors
 import  pudb
 
 
-str_version = "2.2.4"
+str_version = "2.2.6"
 str_desc    = Colors.CYAN + """
 
                         _  _____  _
@@ -64,6 +64,7 @@ def synopsis(ab_shortOnly=False):
                      -o|--output <outputFileStem>           \\
                     [-t|--outputFileType <outputFileType>]  \\
                     [-s|--sliceToConvert <sliceToConvert>]  \\
+                    [--convertOnlySingleDICOM]              \\
                     [-f|--frameToConvert <frameToConvert>]  \\
                     [--showSlices]                          \\
                     [--func <functionName>]                 \\
@@ -119,6 +120,13 @@ def synopsis(ab_shortOnly=False):
 
         and the output filename will have each DICOM tag string as
         specified in order, connected with dashes.
+
+        [--convertOnlySingleDICOM]
+        If specified, will only convert the single DICOM specified by the
+        '--inputFile' flag. This is useful for the case when an input
+        directory has many DICOMS but you specifially only want to convert
+        the named file. By default the script assumes that multiple DICOMS
+        should be converted en mass otherwise.
 
         [-t|--outputFileType <outputFileType>]
         The output file type. If different to <outputFileStem> extension,
@@ -223,6 +231,11 @@ parser.add_argument("-t", "--outputFileType",
                     help    = "output image type",
                     dest    = 'outputFileType',
                     default = '')
+parser.add_argument("--convertOnlySingleDICOM",
+                    help    = "if specified, only convert the specific input DICOM",
+                    dest    = 'convertOnlySingleDICOM',
+                    action  = 'store_true',
+                    default = False)
 parser.add_argument("-s", "--sliceToConvert",
                     help="slice to convert (for 3D data)",
                     dest='sliceToConvert',

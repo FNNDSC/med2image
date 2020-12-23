@@ -1,4 +1,4 @@
-med2image 2.2.4
+med2image 2.2.6
 ==================
 
 Quick Overview
@@ -68,27 +68,27 @@ How to Use
 
 .. code:: bash
 
-    # Convert a NifTI file 'vol.nii' to JPEG and store 
+    # Convert a NifTI file 'vol.nii' to JPEG and store
     # the results in a dirctory called 'out'.
-    # The 'out' dir will contain a set of JPEG 
+    # The 'out' dir will contain a set of JPEG
     # images of form 'output-sliceXXX.jpg'.
 
     med2image -i vol.nii -d out
-    
+
 .. code:: bash
 
-    # Convert a DICOM file 'file.dcm' to JPEG and store 
+    # Convert a DICOM file 'file.dcm' to JPEG and store
     # the results in a dirctory called 'out'.
-    # The 'out' dir will contain a set of JPEG 
+    # The 'out' dir will contain a set of JPEG
     # images of form 'output-sliceXXX.jpg'.
-    
+
     # NOTE! If the directory containing 'file.dcm' contains
     # multiple DICOM files, *ALL* of these will be converted
     # to JPEG. See later for only converting a *single*
     # DICOM file.
-    
+
     med2image -i file.dcm -d out
-   
+
 ``NIfTI`` details
 -----------------
 
@@ -226,6 +226,7 @@ Convert ``DICOM``
 
 - If ``--outputDir | -d`` is not provided, any output(s) are created in the current directory.
 - if ``--sliceToConvert`` argument is not specified and if mutiple ``dcm`` files are contained in the input directory with the ``DICOM`` input, then all the ``.dcm`` files are converted.
+- alternatively, specifying a ``--convertOnlySingleDICOM`` will only convert the DICOM file specified with the ``--inputFile`` flag.
 
 
 Convert all DICOMS in a directory/series
@@ -246,7 +247,7 @@ To convert all the ``DICOM`` files in a directory, simply specify either ``--sli
     med2image -i SAG-anon/0001-1.3.12.2.1107.5.2.19.45152.2013030808110258929186035.dcm  \
               -d dicom-results/all-slices      \
               -o sample                        \
-              --outputFileType jpg             
+              --outputFileType jpg
 
 
 resulting in
@@ -355,12 +356,12 @@ No interpolation in the ``x`` and ``y`` directions is performed. This often resu
 Special Operations
 ------------------
 
-``med2image`` also supports some very basic image processing through a ``--func <functionName>`` CLI, which applies some canned transformation on the image. Currently supported is 
+``med2image`` also supports some very basic image processing through a ``--func <functionName>`` CLI, which applies some canned transformation on the image. Currently supported is
 
 ::
 
     --func invertIntensities
-    
+
 which simply inverts the contrast intensity of the source image. Additional functions are planned for future releases.
 
 Command Line Arguments
@@ -400,6 +401,13 @@ Command Line Arguments
 
         and the output filename will have each DICOM tag string as
         specified in order, connected with dashes.
+
+        [--convertOnlySingleDICOM]
+        If specified, will only convert the single DICOM specified by the
+        '--inputFile' flag. This is useful for the case when an input
+        directory has many DICOMS but you specifially only want to convert
+        the named file. By default the script assumes that multiple DICOMS
+        should be converted en mass otherwise.
 
         [-t|--outputFileType <outputFileType>]
         The output file type. If different to <outputFileStem> extension,
