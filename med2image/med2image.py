@@ -90,41 +90,41 @@ class med2image(object):
 
     _dictErr = {
         'inputFileFail'   : {
-            'action'        : 'trying to read input file, ',
-            'error'         : 'could not access/read file -- does it exist? Do you have permission?',
-            'exitCode'      : 10},
+            'action'        :   'trying to read input file, ',
+            'error'         :   'could not access/read file -- does it exist? Do you have permission?',
+            'exitCode'      :   10},
         'emailFail'   : {
-            'action'        : 'attempting to send notification email, ',
-            'error'         : 'sending failed. Perhaps host is not email configured?',
-            'exitCode'      : 20},
+            'action'        :   'attempting to send notification email, ',
+            'error'         :   'sending failed. Perhaps host is not email configured?',
+            'exitCode'      :   20},
         'dcmInsertionFail': {
-            'action'        : 'attempting insert DICOM into volume structure, ',
-            'error'         : 'a dimension mismatch occurred. This DICOM file is of different image size to the rest.',
-            'exitCode'      : 20},
+            'action'        :   'attempting insert DICOM into volume structure, ',
+            'error'         :   'a dimension mismatch occurred. This DICOM file is of different image size to the rest.',
+            'exitCode'      :   30},
         'ProtocolNameTag': {
-            'action'        : 'attempting to parse DICOM header, ',
-            'error'         : 'the DICOM file does not seem to contain a ProtocolName tag.',
-            'exitCode'      : 30},
-        'PatientNameTag': {
-            'action': 'attempting to parse DICOM header, ',
-            'error': 'the DICOM file does not seem to contain a PatientName tag.',
-            'exitCode': 30},
+            'action'        :   'attempting to parse DICOM header, ',
+            'error'         :   'the DICOM file does not seem to contain a ProtocolName tag.',
+            'exitCode'      :   40},
+        'PatientNameTag':   {
+            'action':           'attempting to parse DICOM header, ',
+            'error':            'the DICOM file does not seem to contain a PatientName tag.',
+            'exitCode':         41},
         'PatientAgeTag': {
-            'action': 'attempting to parse DICOM header, ',
-            'error': 'the DICOM file does not seem to contain a PatientAge tag.',
-            'exitCode': 30},
+            'action': '         attempting to parse DICOM header, ',
+            'error':            'the DICOM file does not seem to contain a PatientAge tag.',
+            'exitCode':         42},
         'PatientNameSex': {
-            'action': 'attempting to parse DICOM header, ',
-            'error': 'the DICOM file does not seem to contain a PatientSex tag.',
-            'exitCode': 30},
+            'action':           'attempting to parse DICOM header, ',
+            'error':            'the DICOM file does not seem to contain a PatientSex tag.',
+            'exitCode':         43},
         'PatientIDTag': {
-            'action': 'attempting to parse DICOM header, ',
-            'error': 'the DICOM file does not seem to contain a PatientID tag.',
-            'exitCode': 30},
+            'action':           'attempting to parse DICOM header, ',
+            'error':            'the DICOM file does not seem to contain a PatientID tag.',
+            'exitCode':         44},
         'SeriesDescriptionTag': {
-            'action': 'attempting to parse DICOM header, ',
-            'error': 'the DICOM file does not seem to contain a SeriesDescription tag.',
-            'exitCode': 30}
+            'action':           'attempting to parse DICOM header, ',
+            'error':            'the DICOM file does not seem to contain a SeriesDescription tag.',
+            'exitCode':         45}
     }
 
     @staticmethod
@@ -221,6 +221,7 @@ class med2image(object):
         self._b_4D                      = False
         self._b_3D                      = False
         self._b_DICOM                   = False
+        self.convertOnlySingleDICOM     = False
         self._Vnp_4DVol                 = None
         self._Vnp_3DVol                 = None
         self._Mnp_2Dslice               = None
@@ -247,16 +248,17 @@ class med2image(object):
         self.func                       = None #transformation function
 
         for key, value in kwargs.items():
-            if key == "inputFile":          self.str_inputFile         = value
-            if key == "inputDir":           self.str_inputDir          = value
-            if key == "outputDir":          self.str_outputDir         = value
-            if key == "outputFileStem":     self.str_outputFileStem    = value
-            if key == "outputFileType":     self.str_outputFileType    = value
-            if key == "sliceToConvert":     self.str_sliceToConvert    = value
-            if key == "frameToConvert":     self.str_frameToConvert    = value
-            if key == "showSlices":         self._b_showSlices          = value
-            if key == 'reslice':            self._b_reslice             = value
-            if key == "func":               self.func                   = value
+            if key == "inputFile":              self.str_inputFile          = value
+            if key == "inputDir":               self.str_inputDir           = value
+            if key == "outputDir":              self.str_outputDir          = value
+            if key == "outputFileStem":         self.str_outputFileStem     = value
+            if key == "outputFileType":         self.str_outputFileType     = value
+            if key == "sliceToConvert":         self.str_sliceToConvert     = value
+            if key == "frameToConvert":         self.str_frameToConvert     = value
+            if key == "convertOnlySingleDICOM": self.convertOnlySingleDICOM = value
+            if key == "showSlices":             self._b_showSlices          = value
+            if key == 'reslice':                self._b_reslice             = value
+            if key == "func":                   self.func                   = value
 
         if self.str_frameToConvert.lower() == 'm':
             self._b_convertMiddleFrame = True
@@ -463,18 +465,17 @@ class med2image_dcm(med2image):
 
         self.l_dcmFileNames = sorted(glob.glob('%s/*.dcm' % self.str_inputDir))
         self.slices         = len(self.l_dcmFileNames)
-
         if self._b_convertMiddleSlice:
             self._sliceToConvert = int(self.slices/2)
             self._dcm            = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert],force=True)
             self.str_inputFile  = self.l_dcmFileNames[self._sliceToConvert]
-
-            # if not self.str_outputFileStem.startswith('%'):
-            #     self.str_outputFileStem, ext = os.path.splitext(self.l_dcmFileNames[self._sliceToConvert])
         if not self._b_convertMiddleSlice and self._sliceToConvert != -1:
             self._dcm = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert],force=True)
             self.str_inputFile = self.l_dcmFileNames[self._sliceToConvert]
         else:
+            self._dcm = dicom.read_file(self.str_inputFile,force=True)
+        if self.convertOnlySingleDICOM:
+            self._sliceToConvert = 1
             self._dcm = dicom.read_file(self.str_inputFile,force=True)
         if self._sliceToConvert == -1:
             self._b_3D = True
@@ -494,7 +495,7 @@ class med2image_dcm(med2image):
                 except Exception as e:
                     self.warn(
                     'dcmInsertionFail',
-                    '\nFor input DICOM file %s%s' % (img, str(e)),
+                    '\nFor input DICOM file %s, %s' % (img, str(e)),
                     True)
                 i += 1
         if self.str_outputFileStem.startswith('%'):
@@ -711,26 +712,27 @@ class object_factoryCreate:
         b_dicomExt = str_inputFileExtension == '.dcm'
         if b_niftiExt:
             self.C_convert = med2image_nii(
-                inputFile       = args.inputFile,
-                inputDir        = args.inputDir,
-                outputDir       = args.outputDir,
-                outputFileStem  = args.outputFileStem,
-                outputFileType  = args.outputFileType,
-                sliceToConvert  = args.sliceToConvert,
-                frameToConvert  = args.frameToConvert,
-                showSlices      = args.showSlices,
-                reslice         = args.reslice
+                inputFile           = args.inputFile,
+                inputDir            = args.inputDir,
+                outputDir           = args.outputDir,
+                outputFileStem      = args.outputFileStem,
+                outputFileType      = args.outputFileType,
+                sliceToConvert      = args.sliceToConvert,
+                frameToConvert      = args.frameToConvert,
+                showSlices          = args.showSlices,
+                reslice             = args.reslice
             )
 
             print('sliceToConvert:', args.sliceToConvert)
 
         if b_dicomExt:
             self.C_convert = med2image_dcm(
-                inputFile       = args.inputFile,
-                inputDir        = args.inputDir,
-                outputDir       = args.outputDir,
-                outputFileStem  = args.outputFileStem,
-                outputFileType  = args.outputFileType,
-                sliceToConvert  = args.sliceToConvert,
-                reslice         = args.reslice
+                inputFile               = args.inputFile,
+                inputDir                = args.inputDir,
+                outputDir               = args.outputDir,
+                outputFileStem          = args.outputFileStem,
+                outputFileType          = args.outputFileType,
+                sliceToConvert          = args.sliceToConvert,
+                convertOnlySingleDICOM  = args.convertOnlySingleDICOM,
+                reslice                 = args.reslice
             )
