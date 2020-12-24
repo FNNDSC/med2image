@@ -2,6 +2,10 @@
 
 # System imports
 import  os
+from    os                  import  listdir
+from    os                  import  walk
+from    os.path             import  isfile, join
+
 import  sys
 import  glob
 import  numpy as np
@@ -10,11 +14,10 @@ import  time
 import  pudb
 
 # System dependency imports
-import nibabel              as      nib
-import pydicom              as      dicom
-import pylab
-import matplotlib.cm        as      cm
-
+import  nibabel              as      nib
+import  pydicom              as      dicom
+import  pylab
+import  matplotlib.cm        as      cm
 
 import  pfmisc
 from    pfmisc._colors      import  Colors
@@ -28,8 +31,10 @@ def report(     callingClass,
                 ):
     '''
     Error handling.
+
     Based on the <astr_key>, error information is extracted from
     _dictErr and sent to log object.
+
     If <ab_exitToOs> is False, error is considered non-fatal and
     processing can continue, otherwise processing terminates.
     '''
@@ -193,27 +198,28 @@ class med2image(object):
         #
         # Object desc block
         #
-        self.str_desc                  = ''
-        # self._log                       = msg.Message()
-        # self._log._b_syslog             = True
-        self.__name__                   = "med2image"
+        self.str_desc                   = ''
+        # self._log                        = msg.Message()
+        # self._log._b_syslog              = True
+        self.__name__                    = "med2image"
 
         # Directory and filenames
-        self.str_workingDir            = ''
-        self.str_inputFile             = ''
-        self.str_outputFileStem        = ''
-        self.str_outputFileType        = ''
-        self.str_outputDir             = ''
-        self.str_inputDir              = ''
+        self.str_workingDir             = ''
+        self.str_inputFile              = ''
+        self.str_inputFileSubStr        = ''
+        self.str_outputFileStem         = ''
+        self.str_outputFileType         = ''
+        self.str_outputDir              = ''
+        self.str_inputDir               = ''
 
         self._b_convertAllSlices        = False
-        self.str_sliceToConvert        = ''
-        self.str_frameToConvert        = ''
+        self.str_sliceToConvert         = ''
+        self.str_frameToConvert         = ''
         self._sliceToConvert            = -1
         self._frameToConvert            = -1
 
-        self.str_stdout                = ""
-        self.str_stderr                = ""
+        self.str_stdout                 = ""
+        self.str_stderr                 = ""
         self._exitCode                  = 0
 
         # The actual data volume and slice
@@ -231,14 +237,10 @@ class med2image(object):
         self.verbosity                  = 1
 
         # A logger
-        # self._log                       = msg.Message()
-        # self._log.syslog(True)
-
         self.dp                         = pfmisc.debug(
                                             verbosity   = self.verbosity,
                                             within      = self.__name__
                                             )
-
 
         # Flags
         self._b_showSlices              = False
@@ -249,6 +251,7 @@ class med2image(object):
 
         for key, value in kwargs.items():
             if key == "inputFile":              self.str_inputFile          = value
+            if key == "inputFileSubStr":        self.str_inputFileSubStr    = value
             if key == "inputDir":               self.str_inputDir           = value
             if key == "outputDir":              self.str_outputDir          = value
             if key == "outputFileStem":         self.str_outputFileStem     = value
@@ -283,7 +286,7 @@ class med2image(object):
             self.str_outputFileType     = str_fileExtension
 
         if not len(self.str_outputFileType) and not len(str_fileExtension):
-            self.str_outputFileType     = '.png'
+            self.str_outputFileType     = 'png'
 
     def tic(self):
         """
@@ -430,6 +433,7 @@ class med2image(object):
         o astr_output
         The output filename to save the slice to.
         '''
+        self.dp.qprint('Input file = %s' % self.str_inputFile)
         self.dp.qprint('Outputfile = %s' % astr_outputFile)
         fformat = astr_outputFile.split('.')[-1]
         if fformat == 'dcm':
@@ -693,6 +697,37 @@ class object_factoryCreate:
         """
         Parse relevant CLI args.
         """
+
+        def inputFile_defineFromSubStr(astr_dir):
+            """
+            This nested function simply determines the first
+            file in the <inputDir> that has a substring in the
+            filename that conforms to the <inputFileType>.
+
+            That file becomes the <inputFile>. The <inputFileType>
+            is a useful shortcut for quickly identifying and using
+            a file without needing to provide its full name.
+            """
+            l_filesInDir    : list  = []
+            l_fileHit       : list  = []
+            # First, get a list of all the files in the directory
+            (_, _, l_filesInDir)    = next(os.walk(astr_dir))
+            l_fileHit               = [
+                s for s in l_filesInDir if args.inputFileSubStr in s
+            ]
+            if len(l_fileHit):
+                return l_fileHit[0]
+            else:
+                return ''
+
+        if len(args.inputFileSubStr):
+            args.inputFile = inputFile_defineFromSubStr(args.inputDir)
+            if not len(args.inputFile):
+                print(  'Input dir has no files with substring %s' % 
+                        args.inputFileSubStr)
+                print('Exiting to system with code 1.')
+                sys.exit(1)
+
         str_outputFileStem, str_outputFileExtension = os.path.splitext(args.outputFileStem)
         if len(str_outputFileExtension):
             str_outputFileExtension = str_outputFileExtension.split('.')[1]
