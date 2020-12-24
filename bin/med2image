@@ -21,7 +21,7 @@ from    pfmisc._colors      import Colors
 import  pudb
 
 
-str_version = "2.2.8"
+str_version = "2.2.10"
 str_desc    = Colors.CYAN + """
 
                         _  _____  _
@@ -58,7 +58,8 @@ def synopsis(ab_shortOnly=False):
     SYNOPSIS
 
             %s                                       \\
-                     -i|--input <inputFile>                 \\
+                    [-i|--input <inputFile>]                \\
+                    [--inputFileSubStr <substr>]            \\
                     [-I|--inputDir <inputDir>]              \\
                     [-d|--outputDir <outputDir>]            \\
                      -o|--output <outputFileStem>           \\
