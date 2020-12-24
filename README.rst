@@ -1,4 +1,4 @@
-med2image 2.2.6
+med2image 2.2.8
 ==================
 
 Quick Overview
@@ -58,9 +58,11 @@ We also offer a docker container of ``med2image`` as a ChRIS-conformant platform
 How to Use
 ----------
 
-``med2image`` needs at a minimum the following required command line arguments:
+``med2image`` needs at a minimum (some of) the following required command line arguments:
 
 - ``-i | --inputFile <inputFile>`` : Input file to convert. Typically a ``DICOM`` file or a ``NifTI`` volume.
+
+- ``--inputFileSubStr <substr>`` : A short hand trick to specify the ``inputFile``. By only specifying a sub string that identifies the file, the first file in the ``inputDir`` that contains the sub string is tagged as the ``inputFile``. This saves a user from needing to specify long and cumbersome file names, esp in the case of many DICOM filenames.
 
 - ``-d | --outputDir <outputDir> :`` The directory to contain the converted output image files.
 
@@ -119,6 +121,7 @@ Convert ``NIfTI``
 **NOTE:**
 
 - If ``--outputDir | -d`` is not provided, outputs are created in the *current* directory.
+
 - if ``--sliceToConvert`` is not provided, *all* the slices of the ``.nii`` volume are converted.
 
 Both 3D and 4D ``NIfTI`` input data are understood. In the case of 4D ``NIfTI``, a specific frame (``--frameToConvert``) can be additionally provided in conjunction with a specific slice index. Conversion options include:
@@ -369,8 +372,22 @@ Command Line Arguments
 
 ::
 
-        -i|--inputFile <inputFile>
+        [-i|--inputFile <inputFile>]
         Input file to convert. Typically a DICOM file or a nifti volume.
+
+        [--inputFileSubStr <substr>]
+        As a convenience, the input file can be determined via a substring
+        search of all the files in the <inputDir> using this flag. The first
+        filename hit that contains the <substr> will be assigned the
+        <inputFile>.
+
+        This flag is useful is input names are long and cumbersome, but
+        a short substring search would identify the file. For example, an
+        input file of
+
+           0043-1.3.12.2.1107.5.2.19.45152.2013030808110149471485951.dcm
+
+        can be specified using ``--inputFileSubStr 0043-``
 
         [-I|--inputDir <inputDir>]
         If specified, a directory containing the <inputFile>. In this case

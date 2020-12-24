@@ -21,7 +21,7 @@ from    pfmisc._colors      import Colors
 import  pudb
 
 
-str_version = "2.2.6"
+str_version = "2.2.8"
 str_desc    = Colors.CYAN + """
 
                         _  _____  _
@@ -88,8 +88,22 @@ def synopsis(ab_shortOnly=False):
 
     ARGS
 
-        -i|--inputFile <inputFile>
+        [-i|--inputFile <inputFile>]
         Input file to convert. Typically a DICOM file or a nifti volume.
+
+        [--inputFileSubStr <substr>]
+        As a convenience, the input file can be determined via a substring
+        search of all the files in the <inputDir> using this flag. The first
+        filename hit that contains the <substr> will be assigned the
+        <inputFile>.
+
+        This flag is useful is input names are long and cumbersome, but
+        a short substring search would identify the file. For example, an
+        input file of
+
+           0043-1.3.12.2.1107.5.2.19.45152.2013030808110149471485951.dcm
+
+        can be specified using ``--inputFileSubStr 0043-``
 
         [-I|--inputDir <inputDir>]
         If specified, a directory containing the <inputFile>. In this case
@@ -214,7 +228,12 @@ parser  = ArgumentParser(description = str_desc, formatter_class = RawTextHelpFo
 
 parser.add_argument("-i", "--inputFile",
                     help    = "input file",
-                    dest    = 'inputFile')
+                    dest    = 'inputFile',
+                    default = '')
+parser.add_argument("--inputFileSubStr",
+                    help    = "input file substring",
+                    dest    = 'inputFileSubStr',
+                    default = '')
 parser.add_argument("-I", "--inputDir",
                     help    = "input directory",
                     dest    = 'inputDir',
@@ -297,7 +316,6 @@ if args.man or args.synopsis:
     print(str_help)
     sys.exit(1)
 
-# sys.exit(0)
 # pudb.set_trace()
 # Create the object
 imgConverter    = med2image.object_factoryCreate(args).C_convert
