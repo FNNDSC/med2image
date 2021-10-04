@@ -129,7 +129,11 @@ class med2image(object):
         'SeriesDescriptionTag': {
             'action':           'attempting to parse DICOM header, ',
             'error':            'the DICOM file does not seem to contain a SeriesDescription tag.',
-            'exitCode':         45}
+            'exitCode':         45},
+        'PatientSexTag': {
+            'action':           'attempting to parse DICOM header, ',
+            'error':            'the DICOM file does not seem to contain a PatientSex tag.',
+            'exitCode':         46}
     }
 
     @staticmethod
