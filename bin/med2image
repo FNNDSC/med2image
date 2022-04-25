@@ -21,7 +21,7 @@ from    pfmisc._colors      import Colors
 import  pudb
 
 
-str_version = "2.4.2"
+str_version = "2.4.12"
 str_desc    = Colors.CYAN + """
 
                         _  _____  _
@@ -350,11 +350,9 @@ if args.man or args.synopsis:
 # Create the object
 imgConverter    = med2image.object_factoryCreate(args).C_convert
 
+# and if it's valid...
 if imgConverter:
-    # Set possible function handling
-    if args.func:   imgConverter.func = args.func
-
-    # And now run it!
+    # run it!
     imgConverter.tic()
     imgConverter.run()
     if args.printElapsedTime: print("Elapsed time = %f seconds" % imgConverter.toc())

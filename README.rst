@@ -1,4 +1,4 @@
-med2image 2.2.10
+med2image 2.4.12
 ==================
 
 Quick Overview
@@ -53,7 +53,7 @@ Should you get an error about ``python3-tk`` not installed, simply do (for examp
 Docker container
 ~~~~~~~~~~~~~~~~
 
-We also offer a docker container of ``med2image`` as a ChRIS-conformant platform plugin here https://github.com/FNNDSC/pl-med2img -- please consult that page for information on running the dockerized container. The containerized version exposes a similar CLI and functionality as this module.
+We also offer a docker container of ``med2image`` as a ChRIS-conformant platform plugin here https://github.com/FNNDSC/pl-med2img (see also the closely related https://github.com/FNNDSC/pl-dcm2img that performs conversions down a directory tree recursively) -- please that reference for information on running the dockerized container. The containerized version exposes a similar CLI and functionality as this module.
 
 How to Use
 ----------
