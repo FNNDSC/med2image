@@ -423,7 +423,13 @@ class med2image(object):
             if str_outputFile.endswith('dcm'):
                 self._dcm = self._dcmList[i]
             self.slice_save(str_outputFile)
-        self.dp.qprint('%d images saved along "%s" dimension.' % ((i+1), str_dim))
+        self.dp.qprint('%d images saved along "%s" dimension' % ((i+1), str_dim),
+                end = '')
+        if self.func:
+            self.dp.qprint(" with '%s' function applied." % self.func,
+                syslog = False)
+        else:
+            self.dp.qprint(".", syslog = False)
 
     def process_slice(self, b_rot90 = False):
         '''
@@ -786,6 +792,7 @@ class object_factoryCreate:
                 sliceToConvert          = args.sliceToConvert,
                 frameToConvert          = args.frameToConvert,
                 showSlices              = args.showSlices,
+                func                    = args.func,
                 reslice                 = args.reslice,
                 verbosity               = args.verbosity
             )
@@ -804,5 +811,6 @@ class object_factoryCreate:
                 reslice                 = args.reslice,
                 rot                     = args.rot,
                 rotAngle                = args.rotAngle,
+                func                    = args.func,
                 verbosity               = args.verbosity
             )
