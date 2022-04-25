@@ -21,7 +21,7 @@ from    pfmisc._colors      import Colors
 import  pudb
 
 
-str_version = "2.4.0"
+str_version = "2.4.2"
 str_desc    = Colors.CYAN + """
 
                         _  _____  _
@@ -53,7 +53,7 @@ def synopsis(ab_shortOnly=False):
     shortSynopsis = '''
     NAME
 
-	    med2image.py - convert medical images to jpg/png/etc.
+        med2image.py - convert medical images to jpg/png/etc.
 
     SYNOPSIS
 
@@ -70,13 +70,15 @@ def synopsis(ab_shortOnly=False):
                     [--showSlices]                          \\
                     [--func <functionName>]                 \\
                     [--reslice]                             \\
+                    [--rotAngle <angle>]                    \\
+                    [--rot <3vec>]                          \\
                     [-x|--man]                              \\
                     [-y|--synopsis]                         \\
                     [--verbosity <level=1>]
 
     BRIEF EXAMPLE
 
-	    med2image.py -i slice.dcm -o slice.jpg
+        med2image.py -i slice.dcm -o slice.jpg
 
     ''' % scriptName
 
@@ -164,10 +166,15 @@ def synopsis(ab_shortOnly=False):
         If specified, render/show image slices as they are created.
 
         [--rot <3DbinVector>]
-        A per dimension 90 degree rotation vector. Useful to rotate individual
-        dimensions. Default is '110', i.e. rotate 'x' and 'y' but not 'z'. Note that
-        for a non-reslice selection, only the 'z' (or third) element of the vector
+        A per dimension binary rotation vector. Useful to rotate individual
+        dimensions by an angle specified with [--rotAngle <angle>]. Default
+        is '110', i.e. rotate 'x' and 'y' but not 'z'. Note that for a
+        non-reslice selection, only the 'z' (or third) element of the vector
         is used.
+
+        [--rotAngle <angle>]
+        Default 90 -- the rotation angle to apply to a given dimension of the
+        <3DbinVector>
 
         [--func <functionName>]
         Apply the specified transformation function before saving. Currently
@@ -177,10 +184,10 @@ def synopsis(ab_shortOnly=False):
               Inverts the contrast intensity of the source image.
 
         [--reslice]
-        For 3D data only. Assuming [i,j,k] coordinates, the default is to save
-        along the 'k' direction. By passing a --reslice image data in the 'i' and
-        'j' directions are also saved. Furthermore, the <outputDir> is subdivided into
-        'slice' (k), 'row' (i), and 'col' (j) subdirectories.
+        For 3D data only. Assuming [x,y,z] coordinates, the default is to save
+        along the 'z' direction. By passing a --reslice image data in the 'x'
+        and 'y' directions are also saved. Furthermore, the <outputDir> is
+        subdivided into 'slice' (z), 'row' (x), and 'col' (y) subdirectories.
 
         [-x|--man]
         Show full help.
@@ -189,7 +196,8 @@ def synopsis(ab_shortOnly=False):
         Show brief help.
 
         [--verbosity <level=1>]
-        Control how chatty med2image is. Set to '0' for blissful silence.
+        Control how chatty med2image is. Set to '0' for blissful silence, '1'
+        for sane progress and '3' for full information.
 
     EXAMPLES
 
@@ -198,22 +206,22 @@ def synopsis(ab_shortOnly=False):
     o Convert each slice in a NIfTI volume 'vol.nii' to a jpg called
       'image-sliceXXX.jpg' and store results in a directory called 'out':
 
-    		med2image -i vol.nii -d out -o image.jpg -s -1
+            med2image -i vol.nii -d out -o image.jpg -s -1
 
     o Convert only the middle slice in an input volume and store in current
       directory:
 
-    		med2image -i vol.nii -o image.jpg -s m
+            med2image -i vol.nii -o image.jpg -s m
 
     o Convert a specific slice, i.e. slice 20
 
-    		med2image -i vol.nii -o image.jpg -s 20
+            med2image -i vol.nii -o image.jpg -s 20
 
     DICOM
 
     o Simply convert a DICOM file called 'slice.dcm' to a jpg called 'slice.jpg':
 
-    		med2image -i slice.dcm -o slice.jpg
+            med2image -i slice.dcm -o slice.jpg
 
     o Convert all DICOMs in a directory. Note that is assumes all DICOM files
       in the directory containing the passed file belong to the same series.
