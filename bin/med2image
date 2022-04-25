@@ -302,7 +302,7 @@ parser.add_argument('--func',
                     dest    = 'func',
                     default = "")
 parser.add_argument('--verbosity',
-                    help    = "apply transformation function before saving",
+                    help    = "verbosity level for app",
                     dest    = 'verbosity',
                     default = "1")
 parser.add_argument('--rot',
