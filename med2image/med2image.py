@@ -12,7 +12,7 @@ import  numpy as np
 import  re
 import  time
 import  pudb
-
+from    scipy               import  ndimage
 # System dependency imports
 import  nibabel              as      nib
 import  pydicom              as      dicom
@@ -240,18 +240,14 @@ class med2image(object):
 
         self.verbosity                  = 1
 
-        # A logger
-        self.dp                         = pfmisc.debug(
-                                            verbosity   = self.verbosity,
-                                            within      = self.__name__
-                                            )
-
         # Flags
         self._b_showSlices              = False
         self._b_convertMiddleSlice      = False
         self._b_convertMiddleFrame      = False
         self._b_reslice                 = False
-        self.func                       = None #transformation function
+        self.func                       = None  # transformation function
+        self.rot                        = '110'
+        self.rotAngle                   = 90
 
         for key, value in kwargs.items():
             if key == "inputFile":              self.str_inputFile          = value
@@ -266,6 +262,15 @@ class med2image(object):
             if key == "showSlices":             self._b_showSlices          = value
             if key == 'reslice':                self._b_reslice             = value
             if key == "func":                   self.func                   = value
+            if key == "verbosity":              self.verbosity              = int(value)
+            if key == "rot":                    self.rot                    = value
+            if key == "rotAngle":               self.rotAngle               = int(value)
+
+        # A logger
+        self.dp                         = pfmisc.debug(
+                                            verbosity   = self.verbosity,
+                                            within      = self.__name__
+                                            )
 
         if self.str_frameToConvert.lower() == 'm':
             self._b_convertMiddleFrame = True
@@ -382,7 +387,6 @@ class med2image(object):
 
     def dim_save(self, **kwargs):
         dims            = self._Vnp_3DVol.shape
-        self.dp.qprint('Image volume logical (i, j, k) size: %s' % str(dims))
         str_dim         = 'z'
         b_makeSubDir    = False
         b_rot90         = False
@@ -406,6 +410,7 @@ class med2image(object):
         if indexStart == 0 and indexStop == -1:
             indexStop = dims[dim_ix[str_dim]]
 
+        self.dp.qprint('Saving along "%s" dimension with %i degree rotation...' % (str_dim, self.rotAngle*b_rot90))
         for i in range(indexStart, indexStop):
             if str_dim == 'x':
                 self._Mnp_2Dslice = self._Vnp_3DVol[i, :, :]
@@ -418,13 +423,14 @@ class med2image(object):
             if str_outputFile.endswith('dcm'):
                 self._dcm = self._dcmList[i]
             self.slice_save(str_outputFile)
+        self.dp.qprint('%d images saved along "%s" dimension.' % ((i+1), str_dim))
 
-    def process_slice(self, b_rot90=None):
+    def process_slice(self, b_rot90 = False):
         '''
         Processes a single slice.
         '''
         if b_rot90:
-            self._Mnp_2Dslice = np.rot90(self._Mnp_2Dslice)
+            self._Mnp_2Dslice = ndimage.rotate(self._Mnp_2Dslice, self.rotAngle)
         if self.func == 'invertIntensities':
             self.invert_slice_intensities()
 
@@ -437,8 +443,8 @@ class med2image(object):
         o astr_output
         The output filename to save the slice to.
         '''
-        self.dp.qprint('Input file = %s' % self.str_inputFile)
-        self.dp.qprint('Outputfile = %s' % astr_outputFile)
+        self.dp.qprint('Input file = %s' % self.str_inputFile, level = 3)
+        self.dp.qprint('Outputfile = %s' % astr_outputFile, level = 3)
         fformat = astr_outputFile.split('.')[-1]
         if fformat == 'dcm':
             if self._dcm:
@@ -601,7 +607,9 @@ class med2image_dcm(med2image):
         if self._b_convertMiddleSlice:
             self.dp.qprint('Converting middle slice in DICOM series:    %d' % self._sliceToConvert)
 
-        l_rot90 = [ True, True, False ]
+        dims            = self._Vnp_3DVol.shape
+        self.dp.qprint('Image volume logical (i, j, k) size: %s' % str(dims))
+        l_rot90 = [ bool(int(self.rot[0])), bool(int(self.rot[1])), bool(int(self.rot[2])) ]
         med2image.mkdir(self.str_outputDir)
         if not self._b_3D:
             str_outputFile = '%s/%s.%s' % (self.str_outputDir,
@@ -613,10 +621,22 @@ class med2image_dcm(med2image):
             rotCount = 0
             if self._b_reslice:
                 for dim in ['x', 'y', 'z']:
-                    self.dim_save(dimension = dim, makeSubDir = True, rot90 = l_rot90[rotCount], indexStart = 0, indexStop = -1)
+                    self.dim_save(
+                            dimension   = dim,
+                            makeSubDir  = True,
+                            rot90       = l_rot90[rotCount],
+                            indexStart  = 0,
+                            indexStop = -1
+                        )
                     rotCount += 1
             else:
-                self.dim_save(dimension = 'z', makeSubDir = False, rot90 = False, indexStart = 0, indexStop = -1)
+                self.dim_save(
+                            dimension   = 'z',
+                            makeSubDir  = False,
+                            rot90       = l_rot90[2],
+                            indexStart  = 0,
+                            indexStop   = -1
+                        )
 
 
 class med2image_nii(med2image):
@@ -694,7 +714,9 @@ class med2image_nii(med2image):
 class object_factoryCreate:
     """
     A class that examines input file string for extension information and
-    returns the relevant convert object.
+    creates a relevant convert object (or None).
+
+    Returns true or false denoting converter object creation.
     """
 
     def __init__(self, args):
@@ -715,7 +737,10 @@ class object_factoryCreate:
             l_filesInDir    : list  = []
             l_fileHit       : list  = []
             # First, get a list of all the files in the directory
-            (_, _, l_filesInDir)    = next(os.walk(astr_dir))
+            try:
+                (_, _, l_filesInDir)    = next(os.walk(astr_dir))
+            except:
+                return ''
             l_fileHit               = [
                 s for s in l_filesInDir if args.inputFileSubStr in s
             ]
@@ -727,10 +752,10 @@ class object_factoryCreate:
         if len(args.inputFileSubStr):
             args.inputFile = inputFile_defineFromSubStr(args.inputDir)
             if not len(args.inputFile):
-                print(  'Input dir has no files with substring %s' % 
-                        args.inputFileSubStr)
-                print('Exiting to system with code 1.')
-                sys.exit(1)
+                print(  'Input dir "%s" has no files with substring "%s"' %
+                        (args.inputDir, args.inputFileSubStr))
+                # print('Exiting to system with code 1.')
+                # sys.exit(1)
 
         str_outputFileStem, str_outputFileExtension = os.path.splitext(args.outputFileStem)
         if len(str_outputFileExtension):
@@ -749,17 +774,20 @@ class object_factoryCreate:
         b_niftiExt = (str_inputFileExtension == '.nii' or
                     str_inputFileExtension == '.gz')
         b_dicomExt = str_inputFileExtension == '.dcm'
+
+        self.C_convert  = None
         if b_niftiExt:
             self.C_convert = med2image_nii(
-                inputFile           = args.inputFile,
-                inputDir            = args.inputDir,
-                outputDir           = args.outputDir,
-                outputFileStem      = args.outputFileStem,
-                outputFileType      = args.outputFileType,
-                sliceToConvert      = args.sliceToConvert,
-                frameToConvert      = args.frameToConvert,
-                showSlices          = args.showSlices,
-                reslice             = args.reslice
+                inputFile               = args.inputFile,
+                inputDir                = args.inputDir,
+                outputDir               = args.outputDir,
+                outputFileStem          = args.outputFileStem,
+                outputFileType          = args.outputFileType,
+                sliceToConvert          = args.sliceToConvert,
+                frameToConvert          = args.frameToConvert,
+                showSlices              = args.showSlices,
+                reslice                 = args.reslice,
+                verbosity               = args.verbosity
             )
 
             print('sliceToConvert:', args.sliceToConvert)
@@ -773,5 +801,8 @@ class object_factoryCreate:
                 outputFileType          = args.outputFileType,
                 sliceToConvert          = args.sliceToConvert,
                 convertOnlySingleDICOM  = args.convertOnlySingleDICOM,
-                reslice                 = args.reslice
+                reslice                 = args.reslice,
+                rot                     = args.rot,
+                rotAngle                = args.rotAngle,
+                verbosity               = args.verbosity
             )

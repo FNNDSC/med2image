@@ -21,7 +21,7 @@ from    pfmisc._colors      import Colors
 import  pudb
 
 
-str_version = "2.2.10"
+str_version = "2.4.0"
 str_desc    = Colors.CYAN + """
 
                         _  _____  _
@@ -71,7 +71,8 @@ def synopsis(ab_shortOnly=False):
                     [--func <functionName>]                 \\
                     [--reslice]                             \\
                     [-x|--man]                              \\
-                    [-y|--synopsis]
+                    [-y|--synopsis]                         \\
+                    [--verbosity <level=1>]
 
     BRIEF EXAMPLE
 
@@ -162,6 +163,12 @@ def synopsis(ab_shortOnly=False):
         [--showSlices]
         If specified, render/show image slices as they are created.
 
+        [--rot <3DbinVector>]
+        A per dimension 90 degree rotation vector. Useful to rotate individual
+        dimensions. Default is '110', i.e. rotate 'x' and 'y' but not 'z'. Note that
+        for a non-reslice selection, only the 'z' (or third) element of the vector
+        is used.
+
         [--func <functionName>]
         Apply the specified transformation function before saving. Currently
         support functions:
@@ -180,6 +187,9 @@ def synopsis(ab_shortOnly=False):
 
         [-y|--synopsis]
         Show brief help.
+
+        [--verbosity <level=1>]
+        Control how chatty med2image is. Set to '0' for blissful silence.
 
     EXAMPLES
 
@@ -283,6 +293,18 @@ parser.add_argument('--func',
                     help    = "apply transformation function before saving",
                     dest    = 'func',
                     default = "")
+parser.add_argument('--verbosity',
+                    help    = "apply transformation function before saving",
+                    dest    = 'verbosity',
+                    default = "1")
+parser.add_argument('--rot',
+                    help    = "3D slice/dimenstion rotation vector",
+                    dest    = 'rot',
+                    default = "110")
+parser.add_argument('--rotAngle',
+                    help    = "3D slice/dimenstion rotation angle",
+                    dest    = 'rotAngle',
+                    default = "90")
 parser.add_argument("-x", "--man",
                     help    = "man",
                     dest    = 'man',
@@ -317,16 +339,18 @@ if args.man or args.synopsis:
     print(str_help)
     sys.exit(1)
 
-# pudb.set_trace()
 # Create the object
 imgConverter    = med2image.object_factoryCreate(args).C_convert
 
-# Set possible function handling
-if args.func:   imgConverter.func = args.func
+if imgConverter:
+    # Set possible function handling
+    if args.func:   imgConverter.func = args.func
 
-# And now run it!
-imgConverter.tic()
-imgConverter.run()
-if args.printElapsedTime: print("Elapsed time = %f seconds" % imgConverter.toc())
-sys.exit(0)
+    # And now run it!
+    imgConverter.tic()
+    imgConverter.run()
+    if args.printElapsedTime: print("Elapsed time = %f seconds" % imgConverter.toc())
+    sys.exit(0)
+else:
+    sys.exit(1)
 
