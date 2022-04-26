@@ -1,4 +1,4 @@
-med2image 2.4.12
+med2image 2.4.16
 ==================
 
 Quick Overview

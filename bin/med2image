@@ -21,7 +21,7 @@ from    pfmisc._colors      import Colors
 import  pudb
 
 
-str_version = "2.4.12"
+str_version = "2.4.16"
 str_desc    = Colors.CYAN + """
 
                         _  _____  _
@@ -101,7 +101,7 @@ def synopsis(ab_shortOnly=False):
         filename hit that contains the <substr> will be assigned the
         <inputFile>.
 
-        This flag is useful is input names are long and cumbersome, but
+        This flag is useful if input names are long and cumbersome, but
         a short substring search would identify the file. For example, an
         input file of
 

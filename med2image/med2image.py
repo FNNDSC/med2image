@@ -152,9 +152,9 @@ class med2image(object):
         else:
             head, tail = os.path.split(newdir)
             if head and not os.path.isdir(head):
-                os.mkdir(head)
+                os.mkdirs(head, exist_ok=True)
             if tail:
-                os.mkdir(newdir)
+                os.mkdirs(newdir, exist_ok=True)
 
     def log(self, *args):
         '''
