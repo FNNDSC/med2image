@@ -382,11 +382,11 @@ class med2image(object):
                                                     frame, index,
                                                     self.str_outputFileType)
         else:
-            if self.preserveDICOMinputName:
-                str_filePart    = self.lstr_inputFile[index]
+            if self.preserveDICOMinputName and str_subDir == 'z' or str_subDir == '':
+                str_filePart    = os.path.splitext(self.lstr_inputFile[index])[0]
             else:
                 str_filePart    = '%s-slice%03d' % (self.str_outputFileStem, index)
-            str_outputFile      = '%s/%s/%s-slice%03d.%s' % (
+            str_outputFile      = '%s/%s/%s.%s' % (
                                         self.str_outputDir,
                                         str_subDir,
                                         str_filePart,
@@ -417,7 +417,6 @@ class med2image(object):
         dim_ix = {'x':0, 'y':1, 'z':2}
         if indexStart == 0 and indexStop == -1:
             indexStop = dims[dim_ix[str_dim]]
-
         self.dp.qprint('Saving along "%s" dimension with %i degree rotation...' % (str_dim, self.rotAngle*b_rot90))
         for i in range(indexStart, indexStop):
             if str_dim == 'x':
@@ -515,7 +514,7 @@ class med2image_dcm(med2image):
             i                       = 0
             for img in self.l_dcmFileNames:
                 self._dcm           = dicom.read_file(img,force=True)
-                self.lstr_inputFile.append(os.path.basename(self.str_inputFile))
+                self.lstr_inputFile.append(os.path.basename(img))
                 image               = self._dcm.pixel_array
                 self._dcmList.append(self._dcm)
                 #print('%s: %s' % (img, image.shape))
@@ -626,7 +625,9 @@ class med2image_dcm(med2image):
         med2image.mkdir(self.str_outputDir)
         if not self._b_3D:
             if self.preserveDICOMinputName:
-                str_outputFile  = self.lstr_inputFile[0]
+                str_outputFile  = '%s/%s.%s' % (self.str_outputDir,
+                                        os.path.splitext(self.lstr_inputFile[0])[0],
+                                        self.str_outputFileType)
             else:
                 str_outputFile  = '%s/%s.%s' % (self.str_outputDir,
                                         self.str_outputFileStem,

@@ -21,7 +21,7 @@ from    pfmisc._colors      import Colors
 import  pudb
 
 
-str_version = "2.4.24"
+str_version = "2.6.0"
 str_desc    = Colors.CYAN + """
 
                         _  _____  _
@@ -148,8 +148,10 @@ def synopsis(ab_shortOnly=False):
         should be converted en mass otherwise.
 
         [--preserveDICOMinputName]
-        If specified, use the input DICOM name as the base of the output
-        filename.
+        If specified, use the input DICOM name as the stem of the output
+        filename, with the specified type ('jpg' or 'png') as the extension.
+        In the case where [--reslice] is additionally specified, only the
+        slice or 'z' direction will preserve original DICOM names.
 
         [-t|--outputFileType <outputFileType>]
         The output file type. If different to <outputFileStem> extension,
