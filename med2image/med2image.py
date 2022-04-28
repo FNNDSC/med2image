@@ -383,7 +383,7 @@ class med2image(object):
                                                     frame, index,
                                                     self.str_outputFileType)
         else:
-            if self.preserveDICOMinputName and str_subDir == 'z' or str_subDir == '':
+            if self.preserveDICOMinputName and (str_subDir == 'z' or str_subDir == ''):
                 str_filePart    = os.path.splitext(self.lstr_inputFile[index])[0]
             else:
                 str_filePart    = '%s-slice%03d' % (self.str_outputFileStem, index)

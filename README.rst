@@ -1,4 +1,4 @@
-med2image 2.6.2
+med2image 2.6.6
 ==================
 
 Quick Overview
