@@ -21,7 +21,7 @@ from    pfmisc._colors      import Colors
 import  pudb
 
 
-str_version = "2.6.2"
+str_version = "2.6.4"
 str_desc    = Colors.CYAN + """
 
                         _  _____  _
@@ -181,7 +181,7 @@ def synopsis(ab_shortOnly=False):
 
         [--rotAngle <angle>]
         Default 90 -- the rotation angle to apply to a given dimension of the
-        <3DbinVector>
+        <3DbinVector>.
 
         [--func <functionName>]
         Apply the specified transformation function before saving. Currently

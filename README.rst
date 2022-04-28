@@ -460,7 +460,7 @@ Command Line Arguments
 
         [--rotAngle <angle>]
         Default 90 -- the rotation angle to apply to a given dimension of the
-        <3DbinVector>
+        <3DbinVector>.
 
         [--func <functionName>]
         Apply the specified transformation function before saving. Currently
