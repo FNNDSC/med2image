@@ -276,6 +276,7 @@ class med2image(object):
                                             verbosity   = self.verbosity,
                                             within      = self.__name__
                                             )
+        self.LOG                        = self.dp.qprint
 
         if self.str_frameToConvert.lower() == 'm':
             self._b_convertMiddleFrame = True
@@ -417,7 +418,7 @@ class med2image(object):
         dim_ix = {'x':0, 'y':1, 'z':2}
         if indexStart == 0 and indexStop == -1:
             indexStop = dims[dim_ix[str_dim]]
-        self.dp.qprint('Saving along "%s" dimension with %i degree rotation...' % (str_dim, self.rotAngle*b_rot90))
+        self.LOG('Saving along "%s" dimension with %i degree rotation...' % (str_dim, self.rotAngle*b_rot90))
         for i in range(indexStart, indexStop):
             if str_dim == 'x':
                 self._Mnp_2Dslice = self._Vnp_3DVol[i, :, :]
@@ -430,13 +431,13 @@ class med2image(object):
             if str_outputFile.endswith('dcm'):
                 self._dcm = self._dcmList[i]
             self.slice_save(str_outputFile)
-        self.dp.qprint('%d images saved along "%s" dimension' % ((i+1), str_dim),
+        self.LOG('%d images saved along "%s" dimension' % ((i+1), str_dim),
                 end = '')
         if self.func:
-            self.dp.qprint(" with '%s' function applied." % self.func,
+            self.LOG(" with '%s' function applied." % self.func,
                 syslog = False)
         else:
-            self.dp.qprint(".", syslog = False)
+            self.LOG(".", syslog = False)
 
     def process_slice(self, b_rot90 = False):
         '''
@@ -454,8 +455,8 @@ class med2image(object):
         o astr_output
         The output filename.
         '''
-        self.dp.qprint('Input file = %s' % self.str_inputFile, level = 3)
-        self.dp.qprint('Outputfile = %s' % astr_outputFile, level = 3)
+        self.LOG('Input file = %s' % self.str_inputFile, level = 3)
+        self.LOG('Outputfile = %s' % astr_outputFile, level = 3)
         fformat = astr_outputFile.split('.')[-1]
         if fformat == 'dcm':
             if self._dcm:
@@ -568,17 +569,17 @@ class med2image_dcm(med2image):
         str_action      = med2image._dictErr[str_tag]['action']
         str_error       = med2image._dictErr[str_tag]['error']
         exitCode        = med2image._dictErr[str_tag]['exitCode']
-        self.dp.qprint(
+        self.LOG(
             'Some error seems to have occured!', comms = 'error'
         )
-        self.dp.qprint(
+        self.LOG(
             'While %s' % str_action, comms = 'error'
         )
-        self.dp.qprint(
+        self.LOG(
             '%s' % str_error, comms = 'error'
         )
         if len(str_extraMsg):
-            self.dp.qprint(str_extraMsg, comms = 'error')
+            self.LOG(str_extraMsg, comms = 'error')
         if b_exit:
             sys.exit(exitCode)
 
@@ -586,40 +587,39 @@ class med2image_dcm(med2image):
         '''
         Runs the DICOM conversion based on internal state.
         '''
-        self.dp.qprint('Converting DICOM image.')
+        self.LOG('DICOM conversion (ref: %s).' % self.lstr_inputFile[0])
+        if self._b_convertMiddleSlice:
+            self.LOG('Converting middle slice in DICOM series')
         try:
-            self.dp.qprint('PatientName:                                %s' % self._dcm.PatientName)
+            self.LOG('\tPatientName:            %s' % self._dcm.PatientName)
         except AttributeError:
-            self.dp.qprint('PatientName:                                %s' % 'PatientName not found in DCM header.')
+            self.LOG('\tPatientName:            %s' % 'PatientName not found in DCM header.')
             self.warn( 'PatientNameTag')
         try:
-            self.dp.qprint('PatientAge:                                 %s' % self._dcm.PatientAge)
+            self.LOG('\tPatientAge:             %s' % self._dcm.PatientAge)
         except AttributeError:
-            self.dp.qprint('PatientAge:                                 %s' % 'PatientAge not found in DCM header.')
+            self.LOG('\tPatientAge:              %s' % 'PatientAge not found in DCM header.')
             self.warn( 'PatientAgeTag')
         try:
-            self.dp.qprint('PatientSex:                                 %s' % self._dcm.PatientSex)
+            self.LOG('\tPatientSex:             %s' % self._dcm.PatientSex)
         except AttributeError:
-            self.dp.qprint('PatientSex:                                 %s' % 'PatientSex not found in DCM header.')
+            self.LOG('\tPatientSex:             %s' % 'PatientSex not found in DCM header.')
             self.warn( 'PatientSexTag')
         try:
-            self.dp.qprint('PatientID:                                  %s' % self._dcm.PatientID)
+            self.LOG('\tPatientID:              %s' % self._dcm.PatientID)
         except AttributeError:
-            self.dp.qprint('PatientID:                                  %s' % 'PatientID not found in DCM header.')
+            self.LOG('\tPatientID:              %s' % 'PatientID not found in DCM header.')
             self.warn( 'PatientIDTag')
         try:
-            self.dp.qprint('SeriesDescription:                          %s' % self._dcm.SeriesDescription)
+            self.LOG('\tSeriesDescription:      %s' % self._dcm.SeriesDescription)
         except AttributeError:
-            self.dp.qprint('SeriesDescription:                          %s' % 'SeriesDescription not found in DCM header.')
+            self.LOG('\tSeriesDescription:      %s' % 'SeriesDescription not found in DCM header.')
             self.warn( 'SeriesDescriptionTag')
         try:
-            self.dp.qprint('ProtocolName:                               %s' % self._dcm.ProtocolName)
+            self.LOG('\tProtocolName:           %s' % self._dcm.ProtocolName)
         except AttributeError:
-            self.dp.qprint('ProtocolName:                               %s' % 'ProtocolName not found in DCM header.')
+            self.LOG('\tProtocolName:           %s' % 'ProtocolName not found in DCM header.')
             self.warn( 'ProtocolNameTag')
-
-        if self._b_convertMiddleSlice:
-            self.dp.qprint('Converting middle slice in DICOM series:    %d' % self._sliceToConvert)
 
         l_rot90 = [ bool(int(self.rot[0])), bool(int(self.rot[1])), bool(int(self.rot[2])) ]
         med2image.mkdir(self.str_outputDir)
@@ -636,7 +636,7 @@ class med2image_dcm(med2image):
             self.slice_save(str_outputFile)
         if self._b_3D:
             dims            = self._Vnp_3DVol.shape
-            self.dp.qprint('Image volume logical (i, j, k) size: %s' % str(dims))
+            self.LOG('Image volume logical (i, j, k) size: %s' % str(dims))
             rotCount = 0
             if self._b_reslice:
                 for dim in ['x', 'y', 'z']:
@@ -685,7 +685,7 @@ class med2image_nii(med2image):
         Runs the NIfTI conversion based on internal state.
         '''
 
-        self.dp.qprint('About to perform NifTI to %s conversion...\n' %
+        self.LOG('About to perform NifTI to %s conversion...\n' %
                   self.str_outputFileType)
 
         frames     = 1
@@ -696,10 +696,10 @@ class med2image_nii(med2image):
         sliceEnd   = 0
 
         if self._b_4D:
-            self.dp.qprint('4D volume detected.\n')
+            self.LOG('4D volume detected.\n')
             frames = self._Vnp_4DVol.shape[3]
         if self._b_3D:
-            self.dp.qprint('3D volume detected.\n')
+            self.LOG('3D volume detected.\n')
 
         if self._b_convertMiddleFrame:
             self._frameToConvert = int(frames/2)
