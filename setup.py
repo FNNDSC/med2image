@@ -12,14 +12,14 @@ def readme():
 
 setup(
       name             =   'med2image',
-      version          =   '2.0.1',
+      version          =   '2.6.6',
       description      =   '(Python) utility to convert medical images to jpg and png',
       long_description =   readme(),
       author           =   'FNNDSC',
       author_email     =   'dev@babymri.org',
       url              =   'https://github.com/FNNDSC/med2image',
       packages         =   ['med2image'],
-      install_requires =   ['nibabel', 'dicom', 'pydicom', 'numpy', 'matplotlib', 'pillow'],
+      install_requires =   ['pfmisc', 'nibabel', 'pydicom', 'numpy', 'matplotlib', 'pillow'],
       #test_suite       =   'nose.collector',
       #tests_require    =   ['nose'],
       scripts          =   ['bin/med2image'],
