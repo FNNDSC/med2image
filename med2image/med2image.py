@@ -671,8 +671,8 @@ class med2image_nii(med2image):
 
     def __init__(self, **kwargs):
         med2image.__init__(self, **kwargs)
-        nimg = nib.load(self.str_inputFile)
-        data = nimg.get_data()
+        nimg = nib.load(self.str_inputFile) 
+        data = np.asanyarray(nimg.dataobj)
         if data.ndim == 4:
             self._Vnp_4DVol     = data
             self._b_4D          = True
