@@ -19,7 +19,7 @@ setup(
       author_email     =   'dev@babymri.org',
       url              =   'https://github.com/FNNDSC/med2image',
       packages         =   ['med2image'],
-      install_requires =   ['pfmisc', 'nibabel', 'pydicom', 'numpy', 'matplotlib', 'pillow'],
+      install_requires =   ['pfmisc', 'nibabel', 'pydicom>=3.0.1', 'numpy', 'matplotlib', 'pillow', 'scipy'],
       #test_suite       =   'nose.collector',
       #tests_require    =   ['nose'],
       scripts          =   ['bin/med2image'],

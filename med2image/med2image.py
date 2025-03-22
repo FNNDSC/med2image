@@ -494,27 +494,27 @@ class med2image_dcm(med2image):
         if self._sliceToConvert != -1 or self.convertOnlySingleDICOM:
             if self._b_convertMiddleSlice:
                 self._sliceToConvert    = int(self.slices/2)
-                self._dcm               = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert],force=True)
+                self._dcm               = dicom.dcmread(self.l_dcmFileNames[self._sliceToConvert],force=True)
                 self.str_inputFile      = self.l_dcmFileNames[self._sliceToConvert]
             if not self._b_convertMiddleSlice and self._sliceToConvert != -1:
-                self._dcm               = dicom.read_file(self.l_dcmFileNames[self._sliceToConvert],force=True)
+                self._dcm               = dicom.dcmread(self.l_dcmFileNames[self._sliceToConvert],force=True)
                 self.str_inputFile      = self.l_dcmFileNames[self._sliceToConvert]
             else:
-                self._dcm               = dicom.read_file(self.str_inputFile,force=True)
+                self._dcm               = dicom.dcmread(self.str_inputFile,force=True)
             if self.convertOnlySingleDICOM:
                 self._sliceToConvert    = 1
-                self._dcm               = dicom.read_file(self.str_inputFile,force=True)
+                self._dcm               = dicom.dcmread(self.str_inputFile,force=True)
             self.lstr_inputFile.append(os.path.basename(self.str_inputFile))
         else:
             self._b_3D              = True
-            self._dcm               = dicom.read_file(self.str_inputFile,force=True)
+            self._dcm               = dicom.dcmread(self.str_inputFile,force=True)
             image                   = self._dcm.pixel_array
             shape2D                 = image.shape
             #print(shape2D)
             self._Vnp_3DVol         = np.empty( (shape2D[0], shape2D[1], self.slices) )
             i                       = 0
             for img in self.l_dcmFileNames:
-                self._dcm           = dicom.read_file(img,force=True)
+                self._dcm           = dicom.dcmread(img,force=True)
                 self.lstr_inputFile.append(os.path.basename(img))
                 image               = self._dcm.pixel_array
                 self._dcmList.append(self._dcm)
