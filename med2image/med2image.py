@@ -792,7 +792,9 @@ class object_factoryCreate:
 
         b_niftiExt = (str_inputFileExtension == '.nii' or
                     str_inputFileExtension == '.gz')
-        b_dicomExt = str_inputFileExtension == '.dcm'
+        b_dicomExt = (str_inputFileExtension == '.dcm' or
+                    str_inputFileExtension == '.IMA' or
+                    re.search(r"(^|/)MR\.",args.inputFile))
 
         self.C_convert  = None
         if b_niftiExt:
@@ -812,7 +814,7 @@ class object_factoryCreate:
 
             print('sliceToConvert:', args.sliceToConvert)
 
-        if b_dicomExt:
+        elif b_dicomExt:
             self.C_convert = med2image_dcm(
                 inputFile               = args.inputFile,
                 inputDir                = args.inputDir,
@@ -828,3 +830,5 @@ class object_factoryCreate:
                 func                    = args.func,
                 verbosity               = args.verbosity
             )
+        else:
+            print(f"ERROR: dont know what to do with {args.inputFile}. not dcm or nii?")
